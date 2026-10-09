@@ -82,13 +82,13 @@ a.btn{display:block;padding:10px;border:1px solid var(--pri);border-radius:8px;c
   <input id="net" inputmode="numeric" maxlength="30" autocomplete="off">
   <label for="tel">Phone No.</label>
   <input id="tel" type="tel" inputmode="tel" maxlength="20" autocomplete="off">
-  <label for="pin">Home Pin (จิ้มจับพิกัด หรือวาง lat,lng)</label>
+  <label for="pin">Home Pin (จับพิกัดหรือวางlat,lng)</label>
   <input id="pin" inputmode="text" placeholder="13.756331,100.501762" autocomplete="off">
-  <button id="gps" type="button" class="ghost" style="width:100%;margin:-4px 0 12px">จิ้มจับพิกัดปัจจุบัน</button>
-  <label for="pain">Pain point (จิ้มเลือก หรือพิมพ์เอง)</label>
+  <button id="gps" type="button" class="ghost" style="width:100%;margin:-4px 0 12px">พิกัดปัจจุบัน</button>
+  <label for="pain">Pain point </label>
   <input id="pain" maxlength="100" autocomplete="off">
   <div class="chips" id="chips"></div>
-  <label for="drum">Drum No. (Line Type) (จิ้มเลือก หรือพิมพ์เอง)</label>
+  <label for="drum">Drum No. (Line Type)</label>
   <input id="drum" maxlength="60" autocomplete="off">
   <div class="chips" id="drumChips"></div>
   <label for="sp">SP Code (Splitter Alias)</label><input id="sp" maxlength="60" autocomplete="off">
@@ -102,8 +102,8 @@ a.btn{display:block;padding:10px;border:1px solid var(--pri);border-radius:8px;c
 
 <script>
 const API = 'https://script.google.com/macros/s/AKfycbyBriSISb1kM9tuLvEmXhCNqQn-Dw-ZyEZ-oBOYr8rCmNSfCU0FvdVknxT323EktpoK/exec';
-const PAINS = ['สัญญาณขาด','เน็ตช้า','หลุดบ่อย','สายขาด','สายหัก/งอ','ไฟ LOS แดง','อุปกรณ์เสีย','อื่นๆ'];
-const DRUMS = ['ZT cable','Shenzhen','Hulli cable','Fiberhome','Fibre3','Change','Chang Yun'];
+const PAINS = ['งานติดตั้งใหม่(NEW)','เน็ตช้า','หลุดบ่อย','สายขาด','สายหัก/งอ','ไฟ LOS แดง','อุปกรณ์เสีย','อื่นๆ'];
+const DRUMS = ['ZT cable','Shenzhen','Hulli cable','Fiberhome','FIBRE3','Change','Chang Yun'];
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 /* แสดงเฉพาะวันที่ yyyy-mm-dd */
