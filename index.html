@@ -78,7 +78,7 @@ a.btn{display:block;padding:10px;border:1px solid var(--pri);border-radius:8px;c
 
 <section id="vForm" class="hide">
   <input type="hidden" id="id">
-  <label for="net">Internet No. <i>*</i> (ขึ้นต้น 888 หรือ 880)</label>
+  <label for="net">Internet No. <i>*</i> (888 หรือ 880)</label>
   <input id="net" inputmode="numeric" maxlength="30" autocomplete="off">
   <label for="tel">Phone No.</label>
   <input id="tel" type="tel" inputmode="tel" maxlength="20" autocomplete="off">
@@ -102,8 +102,8 @@ a.btn{display:block;padding:10px;border:1px solid var(--pri);border-radius:8px;c
 
 <script>
 const API = 'https://script.google.com/macros/s/AKfycbyBriSISb1kM9tuLvEmXhCNqQn-Dw-ZyEZ-oBOYr8rCmNSfCU0FvdVknxT323EktpoK/exec';
-const PAINS = ['งานติดตั้งใหม่(NEW)','เน็ตช้า','หลุดบ่อย','สายขาด','สายหัก/งอ','ไฟ LOS แดง','อุปกรณ์เสีย','อื่นๆ'];
-const DRUMS = ['ZT cable','Shenzhen','Hulli cable','Fiberhome','FIBRE3','Change','Chang Yun'];
+const PAINS = ['ไฟ LOS แดง','สายขาด','สายหัก/งอ','อุปกรณ์เสีย','งานติดตั้งใหม่(NEW)','เน็ตช้า/หลุดบ่อย','IPCAM(Cloud)','อื่นๆ'];
+const DRUMS = ['ZT cable','Shenzhen','Hulli cable','Fiberhome','FIBRE3','Change','Chang Yun','AWN'];
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 /* แสดงเฉพาะวันที่ yyyy-mm-dd */
