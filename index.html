@@ -44,7 +44,7 @@ header button{background:transparent;color:inherit;border:1px solid currentColor
 .head button{padding:6px 12px;font-size:14px;white-space:nowrap}
 .detail{display:none;padding:4px 12px 12px;border-top:1px solid var(--line)}
 .item.open .detail{display:block}
-.detail small{color:var(--mut);display:block}
+.detail small{color:var(--mut);display:block;overflow-wrap:anywhere}
 .tag{display:inline-block;padding:1px 10px;border-radius:12px;background:var(--acc);color:#14282a;font-size:13px;font-weight:600}
 .note{margin:8px 0 0;white-space:pre-wrap;word-break:break-word}
 .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
@@ -54,6 +54,14 @@ a.btn{display:block;padding:10px;border:1px solid var(--pri);border-radius:8px;c
 .chips:empty{display:none}
 .chips button{padding:6px 12px;font-size:14px;font-weight:500;border-radius:16px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.bc{background:#fff;border:1px solid var(--line);border-radius:6px;padding:4px;margin:6px 0 12px;cursor:zoom-in}
+.bc:empty{display:none}
+.bc svg{display:block;width:100%;height:84px}
+#big{position:fixed;inset:0;background:#fff;color:#000;z-index:20;display:flex;align-items:center;justify-content:center;padding:16px;text-align:center;cursor:zoom-out}
+#bigBox{width:100%;max-width:900px}
+#bigBox svg{display:block;width:100%;height:30vh;min-height:120px}
+.bigt{font:600 22px/1.3 ui-monospace,Menlo,Consolas,monospace;margin-top:12px;overflow-wrap:anywhere}
+.bigh{font-size:13px;color:#555;margin:12px 0 0}
 #msg{color:var(--err);min-height:1.5em;margin:0 0 8px}
 .empty{color:var(--mut);text-align:center;padding:32px 0}
 </style>
@@ -71,7 +79,7 @@ a.btn{display:block;padding:10px;border:1px solid var(--pri);border-radius:8px;c
 </section>
 
 <section id="vList" class="hide">
-  <input id="q" type="search" placeholder="ค้นหา Internet No. / Phone / Drum / SP / Pain point" aria-label="ค้นหา">
+  <input id="q" type="search" placeholder="ค้นหา Internet No. / Phone / SN / Drum" aria-label="ค้นหา">
   <div id="items"></div>
   <button id="add" class="fab">+ เพิ่มข้อมูล</button>
 </section>
@@ -92,6 +100,9 @@ a.btn{display:block;padding:10px;border:1px solid var(--pri);border-radius:8px;c
   <input id="drum" maxlength="60" autocomplete="off">
   <div class="chips" id="drumChips"></div>
   <label for="sp">SP Code (Splitter Alias)</label><input id="sp" maxlength="60" autocomplete="off">
+  <label for="sn">SN (Serial Number)</label>
+  <input id="sn" maxlength="40" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" style="margin-bottom:4px">
+  <div class="bc" id="bcPrev" data-a="bcp" title="แตะเพื่อขยาย"></div>
   <label for="plate">Name Plate</label>
   <select id="plate"><option value="">ไม่ระบุ</option><option value="มี">มี</option><option value="ไม่มี">ไม่มี</option></select>
   <label for="note">Drop Details (หมายเหตุ)</label>
@@ -100,14 +111,45 @@ a.btn{display:block;padding:10px;border:1px solid var(--pri);border-radius:8px;c
 </section>
 </main>
 
+<div id="big" class="hide"><div id="bigBox"></div></div>
+
 <script>
 const API = 'https://script.google.com/macros/s/AKfycbyBriSISb1kM9tuLvEmXhCNqQn-Dw-ZyEZ-oBOYr8rCmNSfCU0FvdVknxT323EktpoK/exec';
 const PAINS = ['ไฟ LOS แดง','สายขาด','สายหัก/งอ','อุปกรณ์เสีย','งานติดตั้งใหม่(NEW)','เน็ตช้า/หลุดบ่อย','IPCAM(Cloud)','อื่นๆ'];
 const DRUMS = ['ZT cable','Shenzhen','Hulli cable','Fiberhome','FIBRE3','Change','Chang Yun','AWN'];
+const SN_RE = /^[A-Za-z0-9][A-Za-z0-9._\/:-]{0,39}$/;
+const SN_ERR = 'SN ใช้ได้เฉพาะตัวอักษรอังกฤษ ตัวเลข และ . _ / : - (ไม่เกิน 40 ตัว ไม่มีช่องว่าง)';
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 /* แสดงเฉพาะวันที่ yyyy-mm-dd */
 function fd(s){ const m = /^(\d{4}-\d\d-\d\d)/.exec(String(s || '')); return m ? m[1] : String(s || ''); }
+
+/*BC-START*/
+/* Code 128 (ชุดอักขระ B) → SVG : ตาราง 107 รูปแบบ (ค่า 0-102 ข้อมูล, 103-105 Start A/B/C, 106 Stop) */
+const C128 = ['212222','222122','222221','121223','121322','131222','122213','122312','132212','221213','221312','231212','112232','122132','122231','113222','123122','123221','223211','221132','221231','213212','223112','312131','311222','321122','321221','312212','322112','322211','212123','212321','232121','111323','131123','131321','112313','132113','132311','211313','231113','231311','112133','112331','132131','113123','113321','133121','313121','211331','231131','213113','213311','213131','311123','311321','331121','312113','312311','332111','314111','221411','431111','111224','111422','121124','121421','141122','141221','112214','112412','122114','122411','142112','142211','241211','221114','413111','241112','134111','111242','121142','121241','114212','124112','124211','411212','421112','421211','212141','214121','412121','111143','111341','131141','114113','114311','411113','411311','113141','114131','311141','411131','211412','211214','211232','2331112'];
+function code128(text){
+  const vals = [104]; let sum = 104;
+  for (let i = 0; i < text.length; i++){
+    const v = text.charCodeAt(i) - 32;
+    if (v < 0 || v > 94) return '';
+    vals.push(v); sum += v * (i + 1);
+  }
+  vals.push(sum % 103, 106);
+  let m = '';
+  vals.forEach(v => { let bar = true; for (const d of C128[v]) { m += (bar ? '1' : '0').repeat(+d); bar = !bar; } });
+  return m;
+}
+function barcodeSvg(text){
+  const m = code128(String(text || '')); if (!m) return '';
+  const Q = 10, w = m.length + 2 * Q; let r = '';
+  for (let i = 0; i < m.length;) {
+    if (m[i] === '1') { let j = i; while (m[j] === '1') j++; r += `<rect x="${Q + i}" width="${j - i}" height="60"/>`; i = j; }
+    else i++;
+  }
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} 60" preserveAspectRatio="none" role="img" aria-label="barcode"><rect width="${w}" height="60" fill="#fff"/><g fill="#000">${r}</g></svg>`;
+}
+/*BC-END*/
+
 let token = sessionStorage.getItem('t'), me = JSON.parse(sessionStorage.getItem('u') || 'null');
 let rows = [], seq = 0, timer, pending = 0, formSeq = 0;
 const SLOW = 'กำลังเชื่อมต่อ… ครั้งแรกอาจใช้เวลาสักครู่';
@@ -138,7 +180,7 @@ async function busy(b, txt, fn){
   try{ return await fn(); } finally { b.disabled = false; b.textContent = old; }
 }
 
-function logout(m){ token = null; me = null; rows = []; sessionStorage.clear(); $('p').value = ''; $('q').value = ''; $('items').innerHTML = ''; view('vLogin'); say(m); }
+function logout(m){ token = null; me = null; rows = []; sessionStorage.clear(); $('p').value = ''; $('q').value = ''; $('items').innerHTML = ''; closeBig(); view('vLogin'); say(m); }
 
 $('go').onclick = () => busy($('go'), 'กำลังเข้าสู่ระบบ…', async () => {
   say();
@@ -182,6 +224,8 @@ function draw(){
         <small>Drum: ${esc(r.drum) || '-'}</small>
         <small>SP: ${esc(r.sp) || '-'}</small>
         <small>Name Plate: ${esc(r.plate) || '-'}</small>
+        <small>SN: ${esc(r.sn) || '-'}</small>
+        ${r.sn ? `<div class="bc" data-a="bc" title="แตะเพื่อขยาย">${barcodeSvg(r.sn)}</div>` : ''}
         ${r.note ? `<p class="note">${esc(r.note)}</p>` : ''}
         <div class="row">
           ${m ? `<a class="btn" target="_blank" rel="noopener noreferrer" href="${m}">นำทาง</a>` : ''}
@@ -204,9 +248,21 @@ function toggle(el){
   if (on) { setOpen(el, true); el.scrollIntoView({block:'nearest'}); }
 }
 
-const F = ['net','tel','pin','pain','drum','sp','plate','note'];
+/* barcode เต็มจอ (พื้นขาว) สำหรับให้เครื่องสแกนอ่าน */
+function showBig(sn){
+  const s = barcodeSvg(sn); if (!s) return;
+  $('bigBox').innerHTML = s + '<div class="bigt">' + esc(sn) + '</div><p class="bigh">แตะเพื่อปิด · หมุนจอแนวนอนเพื่อให้สแกนง่ายขึ้น</p>';
+  $('big').classList.remove('hide');
+}
+function closeBig(){ $('big').classList.add('hide'); $('bigBox').innerHTML = ''; }
+$('big').onclick = closeBig;
+
+const F = ['net','tel','pin','pain','drum','sp','sn','plate','note'];
 function lock(on){ F.forEach(k => $(k).disabled = on); $('save').disabled = on; $('gps').disabled = on; }
-function fill(r){ F.forEach(k => $(k).value = r[k] ?? ''); }
+function prevBC(){ const v = $('sn').value.trim(); $('bcPrev').innerHTML = v && SN_RE.test(v) ? barcodeSvg(v) : ''; }
+function fill(r){ F.forEach(k => $(k).value = r[k] ?? ''); prevBC(); }
+$('sn').oninput = prevBC;
+$('bcPrev').onclick = () => { const v = $('sn').value.trim(); if (v && SN_RE.test(v)) showBig(v); };
 
 function openForm(r){
   say(); formSeq++; $('id').value = r ? r.id : '';
@@ -217,6 +273,7 @@ function openForm(r){
 $('items').onclick = async e => {
   const b = e.target.closest('[data-a]'); if (!b) return;
   const el = b.closest('.item'), id = el.dataset.id, r = rows.find(x => x.id === id); if (!r) return;
+  if (b.dataset.a === 'bc') return showBig(r.sn);
   if (b.dataset.a === 'tog') return toggle(el);
   if (b.dataset.a === 'edit') {
     openForm(); const my = formSeq;
@@ -264,6 +321,7 @@ $('save').onclick = () => busy($('save'), 'กำลังบันทึก…'
   say();
   const rec = {id: $('id').value}; F.forEach(k => rec[k] = $(k).value.trim());
   if (!/^(888|880)\d+$/.test(rec.net)) return say('Internet No. ต้องเป็นตัวเลขและขึ้นต้นด้วย 888 หรือ 880');
+  if (rec.sn && !SN_RE.test(rec.sn)) return say(SN_ERR);
   const j = await api('save', {rec});
   if (!j.ok) return say(j.error);
   upsert(j.item); formSeq++; view('vList'); draw(); window.scrollTo(0, 0);
