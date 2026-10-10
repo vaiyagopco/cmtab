@@ -36,6 +36,10 @@ button.ghost{background:transparent;color:var(--pri);border:1px solid var(--pri)
 button.del{background:var(--err);color:#fff}
 header button{background:transparent;color:inherit;border:1px solid currentColor;padding:6px 12px}
 .fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));background:var(--acc);color:#14282a;box-shadow:0 2px 8px #0004;padding:14px 20px;border-radius:28px}
+.who{color:var(--mut);margin:4px 0 8px}
+.tool{display:block;width:100%;text-align:left;background:var(--card);color:var(--ink);border:1px solid var(--line);border-left:5px solid var(--acc);border-radius:8px;padding:16px;margin:10px 0}
+.tool b{display:block;font-size:19px}
+.tool span{display:block;color:var(--mut);font-size:14px;font-weight:400}
 .item{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--acc);border-radius:8px;margin:8px 0;overflow:hidden}
 .head{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer}
 .hl{flex:1;min-width:0}
@@ -54,9 +58,11 @@ a.btn{display:block;padding:10px;border:1px solid var(--pri);border-radius:8px;c
 .chips:empty{display:none}
 .chips button{padding:6px 12px;font-size:14px;font-weight:500;border-radius:16px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.bc{background:#fff;border:1px solid var(--line);border-radius:6px;padding:4px;margin:6px 0 12px;cursor:zoom-in}
+.bc{background:#fff;border:1px solid var(--line);border-radius:6px;padding:4px;margin:6px 0 8px;cursor:zoom-in}
 .bc:empty{display:none}
 .bc svg{display:block;width:100%;height:84px}
+.hint{color:var(--mut);min-height:1.5em;margin:4px 0 12px}
+.hint.bad{color:var(--err)}
 #big{position:fixed;inset:0;background:#fff;color:#000;z-index:20;display:flex;align-items:center;justify-content:center;padding:16px;text-align:center;cursor:zoom-out}
 #bigBox{width:100%;max-width:900px}
 #bigBox svg{display:block;width:100%;height:30vh;min-height:120px}
@@ -68,7 +74,7 @@ a.btn{display:block;padding:10px;border:1px solid var(--pri);border-radius:8px;c
 </head>
 <body>
 <div id="bar"></div>
-<header><div><h1>CMTabSystem</h1><span>Customer Maintenance Table</span></div><button id="out" class="hide">ออก</button></header>
+<header><div><h1>CMTabSystem</h1><span>Customer Maintenance Table</span></div><button id="home" class="hide">หน้าแรก</button><button id="out" class="hide">ออก</button></header>
 <main>
 <p id="msg" role="alert"></p>
 
@@ -78,8 +84,22 @@ a.btn{display:block;padding:10px;border:1px solid var(--pri);border-radius:8px;c
   <button id="go" style="width:100%">เข้าสู่ระบบ</button>
 </section>
 
+<section id="vHome" class="hide">
+  <p class="who" id="who"></p>
+  <button class="tool" id="toolList"><b>ข้อมูลลูกค้า</b><span>บันทึก ค้นหา และแก้ไขงานซ่อม</span></button>
+  <button class="tool" id="toolBar"><b>Barcode</b><span>สร้าง barcode จาก SN หรือข้อความ และดาวน์โหลดเป็นภาพ</span></button>
+</section>
+
+<section id="vBar" class="hide">
+  <label for="bt">SN หรือข้อความ</label>
+  <input id="bt" maxlength="80" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="เช่น FHTT0A1B2C3D" style="margin-bottom:8px">
+  <div class="bc" id="btPrev" title="แตะเพื่อขยาย"></div>
+  <p class="hint" id="btMsg"></p>
+  <div class="two"><button id="btBig" class="ghost" disabled>ขยายเต็มจอ</button><button id="btDl" disabled>ดาวน์โหลด PNG</button></div>
+</section>
+
 <section id="vList" class="hide">
-  <input id="q" type="search" placeholder="ค้นหา Internet No. / Phone / SN / Drum" aria-label="ค้นหา">
+  <input id="q" type="search" placeholder="ค้นหา Internet No. / Phone / Drum / SP / Pain point" aria-label="ค้นหา">
   <div id="items"></div>
   <button id="add" class="fab">+ เพิ่มข้อมูล</button>
 </section>
@@ -100,9 +120,6 @@ a.btn{display:block;padding:10px;border:1px solid var(--pri);border-radius:8px;c
   <input id="drum" maxlength="60" autocomplete="off">
   <div class="chips" id="drumChips"></div>
   <label for="sp">SP Code (Splitter Alias)</label><input id="sp" maxlength="60" autocomplete="off">
-  <label for="sn">SN (Serial Number)</label>
-  <input id="sn" maxlength="40" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" style="margin-bottom:4px">
-  <div class="bc" id="bcPrev" data-a="bcp" title="แตะเพื่อขยาย"></div>
   <label for="plate">Name Plate</label>
   <select id="plate"><option value="">ไม่ระบุ</option><option value="มี">มี</option><option value="ไม่มี">ไม่มี</option></select>
   <label for="note">Drop Details (หมายเหตุ)</label>
@@ -117,8 +134,6 @@ a.btn{display:block;padding:10px;border:1px solid var(--pri);border-radius:8px;c
 const API = 'https://script.google.com/macros/s/AKfycbyBriSISb1kM9tuLvEmXhCNqQn-Dw-ZyEZ-oBOYr8rCmNSfCU0FvdVknxT323EktpoK/exec';
 const PAINS = ['ไฟ LOS แดง','สายขาด','สายหัก/งอ','อุปกรณ์เสีย','งานติดตั้งใหม่(NEW)','เน็ตช้า/หลุดบ่อย','IPCAM(Cloud)','อื่นๆ'];
 const DRUMS = ['ZT cable','Shenzhen','Hulli cable','Fiberhome','FIBRE3','Change','Chang Yun','AWN'];
-const SN_RE = /^[A-Za-z0-9][A-Za-z0-9._\/:-]{0,39}$/;
-const SN_ERR = 'SN ใช้ได้เฉพาะตัวอักษรอังกฤษ ตัวเลข และ . _ / : - (ไม่เกิน 40 ตัว ไม่มีช่องว่าง)';
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 /* แสดงเฉพาะวันที่ yyyy-mm-dd */
@@ -150,12 +165,39 @@ function barcodeSvg(text){
 }
 /*BC-END*/
 
+/* สร้างไฟล์ภาพ PNG ของ barcode (ความกว้าง 1 module = 4 พิกเซล พร้อมข้อความใต้แท่ง) */
+function pngBlob(text, cb){
+  const m = code128(text); if (!m) return cb(null);
+  const S = 4, Q = 10, H = 160, T = 20, B = 64;
+  const W = (m.length + 2 * Q) * S, c = document.createElement('canvas');
+  c.width = W; c.height = T + H + B;
+  const x = c.getContext('2d');
+  x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.fillStyle = '#000';
+  for (let i = 0; i < m.length;) {
+    if (m[i] === '1') { let j = i; while (m[j] === '1') j++; x.fillRect((Q + i) * S, T, (j - i) * S, H); i = j; }
+    else i++;
+  }
+  x.font = 'bold 28px ui-monospace,Menlo,Consolas,monospace'; x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.fillText(text, W / 2, T + H + B / 2);
+  c.toBlob(cb, 'image/png');
+}
+
 let token = sessionStorage.getItem('t'), me = JSON.parse(sessionStorage.getItem('u') || 'null');
-let rows = [], seq = 0, timer, pending = 0, formSeq = 0;
+let rows = [], seq = 0, timer, pending = 0, formSeq = 0, loaded = false, keepSn = '';
 const SLOW = 'กำลังเชื่อมต่อ… ครั้งแรกอาจใช้เวลาสักครู่';
 
-function view(v){ ['vLogin','vList','vForm'].forEach(x => $(x).classList.toggle('hide', x !== v)); $('out').classList.toggle('hide', v === 'vLogin'); }
+const VIEWS = ['vLogin','vHome','vBar','vList','vForm'];
+function view(v){
+  VIEWS.forEach(x => $(x).classList.toggle('hide', x !== v));
+  $('out').classList.toggle('hide', v === 'vLogin');
+  $('home').classList.toggle('hide', !(v === 'vList' || v === 'vBar'));
+}
 function say(t){ $('msg').textContent = t || ''; }
+function goHome(){
+  formSeq++; say(); closeBig();
+  $('who').textContent = me ? 'เข้าสู่ระบบเป็น ' + me.name + (me.role === 'admin' ? ' (ผู้ดูแล)' : '') : '';
+  view('vHome');
+}
 
 async function api(action, data = {}){
   pending++; $('bar').classList.add('on');
@@ -180,26 +222,68 @@ async function busy(b, txt, fn){
   try{ return await fn(); } finally { b.disabled = false; b.textContent = old; }
 }
 
-function logout(m){ token = null; me = null; rows = []; sessionStorage.clear(); $('p').value = ''; $('q').value = ''; $('items').innerHTML = ''; closeBig(); view('vLogin'); say(m); }
+function logout(m){
+  token = null; me = null; rows = []; loaded = false; sessionStorage.clear();
+  $('p').value = ''; $('q').value = ''; $('bt').value = ''; $('items').innerHTML = '';
+  closeBig(); view('vLogin'); say(m);
+}
 
 $('go').onclick = () => busy($('go'), 'กำลังเข้าสู่ระบบ…', async () => {
   say();
   const j = await api('login', {user: $('u').value, pin: $('p').value});
   $('p').value = '';
   if (!j.ok) return say(j.error);
-  token = j.token; me = j.user; rows = j.rows || [];
+  token = j.token; me = j.user; rows = j.rows || []; loaded = true;
   sessionStorage.setItem('t', token); sessionStorage.setItem('u', JSON.stringify(me));
-  view('vList'); draw();
+  goHome();
 });
 $('out').onclick = () => logout();
+$('home').onclick = () => goHome();
 
+/* ---------- หน้าแรก: เครื่องมือ ---------- */
+$('toolList').onclick = () => { if (loaded) { view('vList'); draw(); load(true); } else load(); };
+$('toolBar').onclick = () => { say(); view('vBar'); updBar(); $('bt').focus(); };
+
+/* ---------- เครื่องมือ Barcode ---------- */
+const BT_RE = /^[ -~]{1,80}$/;
+let curBlob = null, curText = '', btSeq = 0;
+function btMsg(t, bad){ $('btMsg').textContent = t; $('btMsg').className = 'hint' + (bad ? ' bad' : ''); }
+function updBar(){
+  const t = $('bt').value.trim(), my = ++btSeq;
+  curBlob = null; curText = ''; $('btDl').disabled = true; $('btBig').disabled = true;
+  if (!t) { $('btPrev').innerHTML = ''; return btMsg('พิมพ์ SN หรือข้อความ แล้ว barcode จะขึ้นให้ทันที'); }
+  if (!BT_RE.test(t)) { $('btPrev').innerHTML = ''; return btMsg('ใช้ได้เฉพาะตัวอักษรอังกฤษ ตัวเลข และสัญลักษณ์ (ไม่รองรับภาษาไทย) ไม่เกิน 80 ตัว', true); }
+  btMsg(''); $('btPrev').innerHTML = barcodeSvg(t); curText = t; $('btBig').disabled = false;
+  pngBlob(t, b => { if (my === btSeq && b) { curBlob = b; $('btDl').disabled = false; } });
+}
+$('bt').oninput = updBar;
+$('btPrev').onclick = () => { if (curText) showBig(curText); };
+$('btBig').onclick = () => { if (curText) showBig(curText); };
+$('btDl').onclick = () => {
+  if (!curBlob) return;
+  const a = document.createElement('a'), u = URL.createObjectURL(curBlob);
+  a.href = u; a.download = 'barcode-' + (curText.replace(/[^A-Za-z0-9._-]+/g, '_').slice(0, 40) || 'code') + '.png';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(u), 5000);
+};
+
+/* barcode เต็มจอ (พื้นขาว) สำหรับให้เครื่องสแกนอ่าน */
+function showBig(sn){
+  const s = barcodeSvg(sn); if (!s) return;
+  $('bigBox').innerHTML = s + '<div class="bigt">' + esc(sn) + '</div><p class="bigh">แตะเพื่อปิด · หมุนจอแนวนอนเพื่อให้สแกนง่ายขึ้น</p>';
+  $('big').classList.remove('hide');
+}
+function closeBig(){ $('big').classList.add('hide'); $('bigBox').innerHTML = ''; }
+$('big').onclick = closeBig;
+
+/* ---------- ข้อมูลลูกค้า ---------- */
 async function load(quiet){
   view('vList'); say(); const my = ++seq;
   if (!quiet) $('items').innerHTML = '<p class="empty">กำลังโหลด…</p>';
   const j = await api('list', {q: $('q').value});
   if (my !== seq) return;
-  if (!j.ok) { $('items').innerHTML = ''; return say(j.error); }
-  rows = j.rows; draw();
+  if (!j.ok) { if (!quiet) $('items').innerHTML = ''; return say(j.error); }
+  rows = j.rows; loaded = true; draw();
 }
 $('q').oninput = () => { clearTimeout(timer); timer = setTimeout(() => load(true), 400); };
 
@@ -224,8 +308,6 @@ function draw(){
         <small>Drum: ${esc(r.drum) || '-'}</small>
         <small>SP: ${esc(r.sp) || '-'}</small>
         <small>Name Plate: ${esc(r.plate) || '-'}</small>
-        <small>SN: ${esc(r.sn) || '-'}</small>
-        ${r.sn ? `<div class="bc" data-a="bc" title="แตะเพื่อขยาย">${barcodeSvg(r.sn)}</div>` : ''}
         ${r.note ? `<p class="note">${esc(r.note)}</p>` : ''}
         <div class="row">
           ${m ? `<a class="btn" target="_blank" rel="noopener noreferrer" href="${m}">นำทาง</a>` : ''}
@@ -248,21 +330,10 @@ function toggle(el){
   if (on) { setOpen(el, true); el.scrollIntoView({block:'nearest'}); }
 }
 
-/* barcode เต็มจอ (พื้นขาว) สำหรับให้เครื่องสแกนอ่าน */
-function showBig(sn){
-  const s = barcodeSvg(sn); if (!s) return;
-  $('bigBox').innerHTML = s + '<div class="bigt">' + esc(sn) + '</div><p class="bigh">แตะเพื่อปิด · หมุนจอแนวนอนเพื่อให้สแกนง่ายขึ้น</p>';
-  $('big').classList.remove('hide');
-}
-function closeBig(){ $('big').classList.add('hide'); $('bigBox').innerHTML = ''; }
-$('big').onclick = closeBig;
-
-const F = ['net','tel','pin','pain','drum','sp','sn','plate','note'];
+const F = ['net','tel','pin','pain','drum','sp','plate','note'];
 function lock(on){ F.forEach(k => $(k).disabled = on); $('save').disabled = on; $('gps').disabled = on; }
-function prevBC(){ const v = $('sn').value.trim(); $('bcPrev').innerHTML = v && SN_RE.test(v) ? barcodeSvg(v) : ''; }
-function fill(r){ F.forEach(k => $(k).value = r[k] ?? ''); prevBC(); }
-$('sn').oninput = prevBC;
-$('bcPrev').onclick = () => { const v = $('sn').value.trim(); if (v && SN_RE.test(v)) showBig(v); };
+/* keepSn: เก็บค่า SN เดิมของรายการ (ถ้าเคยบันทึกไว้) เพื่อไม่ให้หายตอนแก้ไข — ไม่แสดงในฟอร์ม */
+function fill(r){ F.forEach(k => $(k).value = r[k] ?? ''); keepSn = r.sn || ''; }
 
 function openForm(r){
   say(); formSeq++; $('id').value = r ? r.id : '';
@@ -273,7 +344,6 @@ function openForm(r){
 $('items').onclick = async e => {
   const b = e.target.closest('[data-a]'); if (!b) return;
   const el = b.closest('.item'), id = el.dataset.id, r = rows.find(x => x.id === id); if (!r) return;
-  if (b.dataset.a === 'bc') return showBig(r.sn);
   if (b.dataset.a === 'tog') return toggle(el);
   if (b.dataset.a === 'edit') {
     openForm(); const my = formSeq;
@@ -319,15 +389,14 @@ function upsert(item){
 
 $('save').onclick = () => busy($('save'), 'กำลังบันทึก…', async () => {
   say();
-  const rec = {id: $('id').value}; F.forEach(k => rec[k] = $(k).value.trim());
+  const rec = {id: $('id').value, sn: keepSn}; F.forEach(k => rec[k] = $(k).value.trim());
   if (!/^(888|880)\d+$/.test(rec.net)) return say('Internet No. ต้องเป็นตัวเลขและขึ้นต้นด้วย 888 หรือ 880');
-  if (rec.sn && !SN_RE.test(rec.sn)) return say(SN_ERR);
   const j = await api('save', {rec});
   if (!j.ok) return say(j.error);
   upsert(j.item); formSeq++; view('vList'); draw(); window.scrollTo(0, 0);
 });
 
-if (token && me) load(); else { view('vLogin'); ping(); }
+if (token && me) { goHome(); ping(); } else { view('vLogin'); ping(); }
 </script>
 </body>
 </html>
