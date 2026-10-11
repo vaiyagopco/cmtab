@@ -40,16 +40,21 @@ header button{background:transparent;color:inherit;border:1px solid currentColor
 .tool{display:block;width:100%;text-align:left;background:var(--card);color:var(--ink);border:1px solid var(--line);border-left:5px solid var(--acc);border-radius:8px;padding:16px;margin:10px 0}
 .tool b{display:block;font-size:19px}
 .tool span{display:block;color:var(--mut);font-size:14px;font-weight:400}
-.item{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--acc);border-radius:8px;margin:8px 0;overflow:hidden}
-.head{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer}
+.item{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:6px;margin:4px 0;overflow:hidden}
+.head{display:flex;align-items:center;gap:8px;padding:5px 10px;cursor:pointer}
 .hl{flex:1;min-width:0}
-.hl b{display:block;font-size:19px;letter-spacing:.5px}
-.dt{display:block;color:var(--mut);font-size:12px;line-height:1.35;overflow-wrap:anywhere}
-.head button{padding:6px 12px;font-size:14px;white-space:nowrap}
+.hl b{font-size:16px;letter-spacing:.3px;margin-right:6px}
+.dt{display:block;color:var(--mut);font-size:11px;line-height:1.3;overflow-wrap:anywhere}
+.head button{padding:3px 10px;font-size:13px;white-space:nowrap}
 .detail{display:none;padding:4px 12px 12px;border-top:1px solid var(--line)}
 .item.open .detail{display:block}
 .detail small{color:var(--mut);display:block;overflow-wrap:anywhere}
-.tag{display:inline-block;padding:1px 10px;border-radius:12px;background:var(--acc);color:#14282a;font-size:13px;font-weight:600}
+.tag{display:inline-block;padding:0 8px;border-radius:10px;background:var(--acc);color:#14282a;font-size:12px;font-weight:600;line-height:1.5}
+.lbar{display:flex;align-items:center;gap:8px;margin:0 0 6px}
+.lbar span{flex:1;color:var(--mut);font-size:13px}
+.lbar button{padding:5px 12px;font-size:13px}
+.dh{margin:10px 2px 2px;color:var(--mut);font-size:12px;font-weight:600}
+.row button,.row a.btn{padding:8px 6px;font-size:14px}
 .note{margin:8px 0 0;white-space:pre-wrap;word-break:break-word}
 .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .row>*{flex:1;text-align:center;text-decoration:none}
@@ -101,11 +106,13 @@ a.btn{display:block;padding:10px;border:1px solid var(--pri);border-radius:8px;c
 
 <section id="vList" class="hide">
   <input id="q" type="search" placeholder="ค้นหา Internet No. / Phone / Drum / SP / Pain point" aria-label="ค้นหา">
+  <div class="lbar"><span id="lcap"></span><button id="hist" type="button" class="ghost">ดูทั้งหมด</button></div>
   <div id="items"></div>
   <button id="add" class="fab">+ เพิ่มข้อมูล</button>
 </section>
 
 <section id="vForm" class="hide">
+  <p class="hint" id="fmode"></p>
   <input type="hidden" id="id">
   <label for="net">Internet No. <i>*</i> (888 หรือ 880)</label>
   <input id="net" inputmode="numeric" maxlength="30" autocomplete="off">
@@ -184,7 +191,7 @@ function pngBlob(text, cb){
 }
 
 let token = sessionStorage.getItem('t'), me = JSON.parse(sessionStorage.getItem('u') || 'null');
-let rows = [], seq = 0, timer, pending = 0, formSeq = 0, loaded = false, keepSn = '';
+let rows = [], allRows = null, found = [], hist = false, seq = 0, timer, pending = 0, formSeq = 0, loaded = false, keepSn = '';
 const SLOW = 'กำลังเชื่อมต่อ… ครั้งแรกอาจใช้เวลาสักครู่';
 
 const VIEWS = ['vLogin','vHome','vBar','vList','vForm'];
@@ -224,7 +231,7 @@ async function busy(b, txt, fn){
 }
 
 function logout(m){
-  token = null; me = null; rows = []; loaded = false; sessionStorage.clear();
+  token = null; me = null; rows = []; allRows = null; found = []; hist = false; loaded = false; sessionStorage.clear();
   $('p').value = ''; $('q').value = ''; $('bt').value = ''; $('items').innerHTML = '';
   closeBig(); view('vLogin'); say(m);
 }
@@ -278,33 +285,49 @@ function closeBig(){ $('big').classList.add('hide'); $('bigBox').innerHTML = '';
 $('big').onclick = closeBig;
 
 /* ---------- ข้อมูลลูกค้า ---------- */
+const today = () => new Date().toLocaleDateString('sv-SE', {timeZone: 'Asia/Bangkok'});
+const qv = () => $('q').value.trim();
+
 async function load(quiet){
-  view('vList'); say(); const my = ++seq;
+  view('vList'); say(); const my = ++seq, q = qv(), all = !q && hist;
   if (!quiet) $('items').innerHTML = '<p class="empty">กำลังโหลด…</p>';
-  const j = await api('list', {q: $('q').value});
+  const j = await api('list', q ? {q} : all ? {all: true} : {});
   if (my !== seq) return;
   if (!j.ok) { if (!quiet) $('items').innerHTML = ''; return say(j.error); }
-  rows = j.rows; loaded = true; draw();
+  if (q) found = j.rows; else { rows = j.rows; if (all) allRows = j.rows; }
+  loaded = true; draw();
 }
-$('q').oninput = () => { clearTimeout(timer); timer = setTimeout(() => load(true), 400); };
+$('q').oninput = () => { clearTimeout(timer); timer = setTimeout(() => load(true), 400); draw(); };
+$('hist').onclick = () => {
+  hist = !hist; draw();
+  if (hist && !allRows) load(); else load(true);
+};
 
 function mapLink(pin){
   const [la, ln] = String(pin).split(',').map(Number);
   return isFinite(la) && isFinite(ln) && pin ? `https://www.google.com/maps/search/?api=1&amp;query=${la},${ln}` : '';
 }
 
-function draw(){
-  $('items').innerHTML = rows.length ? rows.map(r => {
-    const m = mapLink(r.pin);
-    const d1 = 'บันทึก ' + fd(r.at) + ' · ' + (r.by || '-');
-    const d2 = r.upAt ? 'แก้ไข ' + fd(r.upAt) + ' · ' + (r.upBy || '-') : '';
-    return `<div class="item" data-id="${esc(r.id)}">
+/* เวลา: ถ้าเป็นวันเดียวกับวันของรายการ แสดงเฉพาะ HH:mm */
+function ts(s, base){ const d = fd(s), t = String(s || '').slice(11, 16); return d === base ? t : d + ' ' + t; }
+
+function shown(){
+  if (qv()) return {list: found, cap: 'ผลค้นหา (ทุกวัน) · ' + found.length + ' รายการ', grp: true};
+  if (hist) { const l = allRows || rows; return {list: l, cap: 'ทั้งหมดที่เคยบันทึก · ' + l.length + ' รายการ', grp: true}; }
+  const t = today(), l = rows.filter(r => fd(r.at) === t);
+  return {list: l, cap: 'วันนี้ ' + t + ' · ' + l.length + ' รายการ', grp: false};
+}
+
+function itemHtml(r){
+  const m = mapLink(r.pin), d0 = fd(r.at);
+  const d1 = 'บันทึก ' + String(r.at || '').slice(11, 16) + ' · ' + (r.by || '-')
+    + (r.upAt ? ' · แก้ไข ' + ts(r.upAt, d0) + ' · ' + (r.upBy || '-') : '');
+  return `<div class="item" data-id="${esc(r.id)}">
       <div class="head" data-a="tog">
-        <div class="hl"><b>${esc(r.net)}</b><span class="dt">${esc(d1)}</span>${d2 ? `<span class="dt">${esc(d2)}</span>` : ''}</div>
+        <div class="hl"><b>${esc(r.net)}</b>${r.pain ? `<span class="tag">${esc(r.pain)}</span>` : ''}<span class="dt">${esc(d1)}</span></div>
         <button type="button" class="ghost" data-a="tog" aria-expanded="false">รายละเอียด ▾</button>
       </div>
       <div class="detail">
-        ${r.pain ? `<p style="margin:8px 0 4px"><span class="tag">${esc(r.pain)}</span></p>` : ''}
         <small>Phone: ${esc(r.tel) || '-'}</small>
         <small>Drum: ${esc(r.drum) || '-'}</small>
         <small>SP: ${esc(r.sp) || '-'}</small>
@@ -313,10 +336,24 @@ function draw(){
         <div class="row">
           ${m ? `<a class="btn" target="_blank" rel="noopener noreferrer" href="${m}">นำทาง</a>` : ''}
           <button class="ghost" data-a="edit">แก้ไข</button>
+          <button class="ghost" data-a="again">+ รายการใหม่</button>
           ${me && me.role === 'admin' ? '<button class="del" data-a="del">ลบ</button>' : ''}
         </div>
       </div></div>`;
-  }).join('') : '<p class="empty">ไม่พบข้อมูล กด “เพิ่มข้อมูล” เพื่อเริ่มบันทึก</p>';
+}
+
+function draw(){
+  const s = shown(), cnt = {};
+  s.list.forEach(r => { const d = fd(r.at); cnt[d] = (cnt[d] || 0) + 1; });
+  $('lcap').textContent = s.cap;
+  $('hist').classList.toggle('hide', !!qv());
+  $('hist').textContent = hist ? 'เฉพาะวันนี้' : 'ดูทั้งหมด';
+  let last = null;
+  $('items').innerHTML = s.list.length ? s.list.map(r => {
+    const d = fd(r.at); let h = '';
+    if (s.grp && d !== last) { last = d; h = `<div class="dh">${esc(d)} · ${cnt[d]} รายการ</div>`; }
+    return h + itemHtml(r);
+  }).join('') : '<p class="empty">' + (qv() ? 'ไม่พบข้อมูล' : hist ? 'ยังไม่มีข้อมูล' : 'วันนี้ยังไม่มีรายการ<br>กด “+ เพิ่มข้อมูล” หรือ “ดูทั้งหมด”') + '</p>';
 }
 
 function setOpen(el, on){
@@ -336,8 +373,8 @@ function lock(on){ F.forEach(k => $(k).disabled = on); $('save').disabled = on; 
 /* keepSn: เก็บค่า SN เดิมของรายการ (ถ้าเคยบันทึกไว้) เพื่อไม่ให้หายตอนแก้ไข — ไม่แสดงในฟอร์ม */
 function fill(r){ F.forEach(k => $(k).value = r[k] ?? ''); keepSn = r.sn || ''; }
 
-function openForm(r){
-  say(); formSeq++; $('id').value = r ? r.id : '';
+function openForm(r, mode){
+  say(); formSeq++; $('id').value = r ? r.id : ''; $('fmode').textContent = mode || (r ? 'แก้ไขรายการเดิม' : 'เพิ่มรายการใหม่');
   fill(r || {}); lock(false); view('vForm'); window.scrollTo(0, 0);
   if (!r) $('net').focus();
 }
@@ -347,7 +384,7 @@ $('items').onclick = async e => {
   const el = b.closest('.item'), id = el.dataset.id, r = rows.find(x => x.id === id); if (!r) return;
   if (b.dataset.a === 'tog') return toggle(el);
   if (b.dataset.a === 'edit') {
-    openForm(); const my = formSeq;
+    openForm(null, 'แก้ไขรายการเดิม'); const my = formSeq;
     $('id').value = id; lock(true); say('กำลังโหลดข้อมูล…');
     const j = await api('get', {id});
     if (my !== formSeq) return;
@@ -355,10 +392,20 @@ $('items').onclick = async e => {
     fill(j.rec); lock(false); say();
     return;
   }
+  if (b.dataset.a === 'again') {
+    openForm(null, 'เพิ่มรายการใหม่ของวันนี้ (คัดข้อมูลลูกค้าจากรายการเดิม ไม่ทับรายการเดิม)'); const my = formSeq;
+    lock(true); say('กำลังโหลดข้อมูล…');
+    const j = await api('get', {id});
+    if (my !== formSeq) return;
+    if (!j.ok) { view('vList'); return say(j.error); }
+    const c = j.rec; fill({net: c.net, tel: c.tel, pin: c.pin, drum: c.drum, sp: c.sp, plate: c.plate}); lock(false); say();
+    $('pain').focus();
+    return;
+  }
   if (b.dataset.a === 'del' && confirm('ลบรายการ ' + r.net + ' (บันทึก ' + fd(r.at) + ') ถาวรหรือไม่?')) {
     busy(b, 'กำลังลบ…', async () => {
       const j = await api('remove', {id});
-      if (j.ok) { rows = rows.filter(x => x.id !== id); draw(); } else say(j.error);
+      if (j.ok) { const f = x => x.id !== id; rows = rows.filter(f); found = found.filter(f); if (allRows) allRows = allRows.filter(f); draw(); } else say(j.error);
     });
   }
 };
@@ -384,8 +431,11 @@ $('gps').onclick = () => {
 };
 
 function upsert(item){
-  const i = rows.findIndex(x => x.id === item.id);
-  if (i >= 0) rows[i] = item; else rows.unshift(item);
+  [rows, allRows, found].forEach((arr, k) => {
+    if (!arr) return;
+    const i = arr.findIndex(x => x.id === item.id);
+    if (i >= 0) arr[i] = item; else if (k < 2) arr.unshift(item);
+  });
 }
 
 $('save').onclick = () => busy($('save'), 'กำลังบันทึก…', async () => {
