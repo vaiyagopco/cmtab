@@ -73,6 +73,10 @@ a.btn{display:block;padding:10px;border:1px solid var(--pri);border-radius:8px;c
 #bigBox svg{display:block;width:100%;height:30vh;min-height:120px}
 .bigt{font:600 22px/1.3 ui-monospace,Menlo,Consolas,monospace;margin-top:12px;overflow-wrap:anywhere}
 .bigh{font-size:13px;color:#555;margin:12px 0 0}
+#dlg{position:fixed;inset:0;z-index:30;background:#000a;display:flex;align-items:center;justify-content:center;padding:20px}
+#dlg .box{background:var(--card);color:var(--ink);border-radius:12px;padding:18px;width:100%;max-width:340px;box-shadow:0 8px 30px #0008}
+#dlg b{font-size:18px;color:var(--err)}
+#dlg p{margin:10px 0 16px;overflow-wrap:anywhere;white-space:pre-line}
 #msg{color:var(--err);min-height:1.5em;margin:0 0 8px}
 .empty{color:var(--mut);text-align:center;padding:32px 0}
 </style>
@@ -136,6 +140,7 @@ a.btn{display:block;padding:10px;border:1px solid var(--pri);border-radius:8px;c
 </section>
 </main>
 
+<div id="dlg" class="hide" role="dialog" aria-modal="true" aria-labelledby="dlgT"><div class="box"><b id="dlgT">ยืนยันการลบ</b><p id="dlgM"></p><div class="two"><button id="dlgNo" class="ghost">ยกเลิก</button><button id="dlgYes" class="del">ลบถาวร</button></div></div></div>
 <div id="big" class="hide"><div id="bigBox"></div></div>
 
 <script>
@@ -284,6 +289,16 @@ function showBig(sn){
 function closeBig(){ $('big').classList.add('hide'); $('bigBox').innerHTML = ''; }
 $('big').onclick = closeBig;
 
+/* ป๊อปอัพยืนยัน (ของเราเอง ไม่ใช้ confirm ของเบราว์เซอร์) */
+function ask(msg, yes){
+  return new Promise(res => {
+    $('dlgM').textContent = msg; $('dlgYes').textContent = yes || 'ลบถาวร'; $('dlg').classList.remove('hide'); $('dlgNo').focus();
+    const done = v => { $('dlg').classList.add('hide'); $('dlgYes').onclick = $('dlgNo').onclick = $('dlg').onclick = null; res(v); };
+    $('dlgYes').onclick = () => done(true); $('dlgNo').onclick = () => done(false);
+    $('dlg').onclick = e => { if (e.target === $('dlg')) done(false); };
+  });
+}
+
 /* ---------- ข้อมูลลูกค้า ---------- */
 const today = () => new Date().toLocaleDateString('sv-SE', {timeZone: 'Asia/Bangkok'});
 const qv = () => $('q').value.trim();
@@ -320,8 +335,9 @@ function shown(){
 
 function itemHtml(r){
   const m = mapLink(r.pin), d0 = fd(r.at);
-  const d1 = 'บันทึก ' + String(r.at || '').slice(11, 16) + ' · ' + (r.by || '-')
-    + (r.upAt ? ' · แก้ไข ' + ts(r.upAt, d0) + ' · ' + (r.upBy || '-') : '');
+  const d1 = r.upAt ? 'แก้ไข: ' + ts(r.upAt, d0) + ' · ' + (r.upBy || '-')
+    : 'บันทึก: ' + String(r.at || '').slice(11, 16) + ' · ' + (r.by || '-');
+  const canDel = me && (me.role === 'admin' || r.by === me.name);
   return `<div class="item" data-id="${esc(r.id)}">
       <div class="head" data-a="tog">
         <div class="hl"><b>${esc(r.net)}</b>${r.pain ? `<span class="tag">${esc(r.pain)}</span>` : ''}<span class="dt">${esc(d1)}</span></div>
@@ -337,7 +353,7 @@ function itemHtml(r){
           ${m ? `<a class="btn" target="_blank" rel="noopener noreferrer" href="${m}">นำทาง</a>` : ''}
           <button class="ghost" data-a="edit">แก้ไข</button>
           <button class="ghost" data-a="again">+ รายการใหม่</button>
-          ${me && me.role === 'admin' ? '<button class="del" data-a="del">ลบ</button>' : ''}
+          ${canDel ? '<button class="del" data-a="del">ลบ</button>' : ''}
         </div>
       </div></div>`;
 }
@@ -402,7 +418,9 @@ $('items').onclick = async e => {
     $('pain').focus();
     return;
   }
-  if (b.dataset.a === 'del' && confirm('ลบรายการ ' + r.net + ' (บันทึก ' + fd(r.at) + ') ถาวรหรือไม่?')) {
+  if (b.dataset.a === 'del') {
+    const ok = await ask('ลบรายการ ' + r.net + '\nบันทึก ' + String(r.at || '') + ' โดย ' + (r.by || '-') + '\n\nลบแล้วกู้คืนไม่ได้ แน่ใจหรือไม่?');
+    if (!ok) return;
     busy(b, 'กำลังลบ…', async () => {
       const j = await api('remove', {id});
       if (j.ok) { const f = x => x.id !== id; rows = rows.filter(f); found = found.filter(f); if (allRows) allRows = allRows.filter(f); draw(); } else say(j.error);
