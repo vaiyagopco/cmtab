@@ -74,21 +74,21 @@ a.btn{display:block;padding:10px;border:1px solid var(--pri);border-radius:8px;c
 </head>
 <body>
 <div id="bar"></div>
-<header><div><h1>CMTabSystem</h1><span>Customer Maintenance Table</span></div><button id="home" class="hide">หน้าแรก</button><button id="out" class="hide">ออก</button></header>
+<header><div><h1>CMLTS</h1><span>CM Tool</span></div><button id="home" class="hide">HOME</button><button id="out" class="hide">EXIT</button></header>
 <main>
 <p id="msg" role="alert"></p>
 
 <section id="vLogin">
   <label for="u">NAME</label><input id="u" autocomplete="username" autocapitalize="none">
   <label for="p">PIN</label><input id="p" type="password" inputmode="numeric" autocomplete="current-password">
-  <button id="go" style="width:100%">เข้าสู่ระบบ</button>
+  <button id="go" style="width:100%">GO</button>
 </section>
 
 <section id="vHome"class="hide">
-  <a class="tool a-tool" id="toolSp" href="https://baronno1-082942.netlify.app/" target="_blank" rel="noopener noreferrer"><b>Splitter Tree</b><span>SPFDV1</span></a>
   <p class="who" id="who"></p>
   <button class="tool" id="toolList"><b>CMList</b><span>v1</span></button>
   <button class="tool" id="toolBar"><b>Barcode</b><span>GenBC</span></button>
+  <a class="tool a-tool" id="toolSp" href="https://cmltoolbymm.netlify.app/" target="_blank" rel="noopener noreferrer"><b>Splitter Tree</b><span>SPFDV1</span></a>
 </section>
 
 <section id="vBar" class="hide">
@@ -96,7 +96,7 @@ a.btn{display:block;padding:10px;border:1px solid var(--pri);border-radius:8px;c
   <input id="bt" maxlength="80" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="เช่น FHTT0A1B2C3D" style="margin-bottom:8px">
   <div class="bc" id="btPrev" title="แตะเพื่อขยาย"></div>
   <p class="hint" id="btMsg"></p>
-  <div class="two"><button id="btBig" class="ghost" disabled>ขยายเต็มจอ</button><button id="btDl" disabled>ดาวน์โหลด PNG</button></div>
+  <div class="two"><button id="btBig" class="ghost" disabled>Zoom</button><button id="btDl" disabled>Save to PNG</button></div>
 </section>
 
 <section id="vList" class="hide">
@@ -133,7 +133,7 @@ a.btn{display:block;padding:10px;border:1px solid var(--pri);border-radius:8px;c
 
 <script>
 const API = 'https://script.google.com/macros/s/AKfycbyBriSISb1kM9tuLvEmXhCNqQn-Dw-ZyEZ-oBOYr8rCmNSfCU0FvdVknxT323EktpoK/exec';
-const PAINS = ['ไฟ LOS แดง','สายขาด','สายหัก/งอ','อุปกรณ์เสีย','งานติดตั้งใหม่(NEW)','เน็ตช้า/หลุดบ่อย','IPCAM(Cloud)','อื่นๆ'];
+const PAINS = ['ออนไลน์ปกติ','สายขาด','สายหัก/งอ','อุปกรณ์เสีย','งานติดตั้งใหม่(NEW)','เน็ตช้า/หลุดบ่อย','IPCAM(Cloud)','อื่นๆ'];
 const DRUMS = ['ZT cable','Shenzhen','Hulli cable','Fiberhome','FIBRE3','Change','Chang Yun','AWN'];
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -252,7 +252,7 @@ function btMsg(t, bad){ $('btMsg').textContent = t; $('btMsg').className = 'hint
 function updBar(){
   const t = $('bt').value.trim(), my = ++btSeq;
   curBlob = null; curText = ''; $('btDl').disabled = true; $('btBig').disabled = true;
-  if (!t) { $('btPrev').innerHTML = ''; return btMsg('พิมพ์ SN หรือข้อความ แล้ว barcode จะขึ้นให้ทันที'); }
+  if (!t) { $('btPrev').innerHTML = ''; return btMsg('พิมพ์ SN'); }
   if (!BT_RE.test(t)) { $('btPrev').innerHTML = ''; return btMsg('ใช้ได้เฉพาะตัวอักษรอังกฤษ ตัวเลข และสัญลักษณ์ (ไม่รองรับภาษาไทย) ไม่เกิน 80 ตัว', true); }
   btMsg(''); $('btPrev').innerHTML = barcodeSvg(t); curText = t; $('btBig').disabled = false;
   pngBlob(t, b => { if (my === btSeq && b) { curBlob = b; $('btDl').disabled = false; } });
