@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'">
+<meta name="theme-color" content="#0f3d3e">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex,nofollow">
+<title>CMLTS Users</title>
+<style>
+:root{--bg:#f3f6f5;--card:#fff;--ink:#14282a;--mut:#5d7274;--pri:#0f3d3e;--acc:#e8a317;--line:#d5e0de;--err:#b3261e;--ok:#1b6e3c}
+@media(prefers-color-scheme:dark){:root{--bg:#0d1a1b;--card:#15292a;--ink:#e6f0ee;--mut:#8fa8a6;--pri:#3ba99c;--acc:#f0b73a;--line:#264041;--err:#ff8a80;--ok:#7bd39a}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font:16px/1.5 system-ui,-apple-system,"Noto Sans Thai","Sarabun",sans-serif;background:var(--bg);color:var(--ink);padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+#bar{position:fixed;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,transparent,var(--acc),transparent) no-repeat;background-size:50% 100%;animation:slide 1s linear infinite;opacity:0;transition:opacity .15s;z-index:9;pointer-events:none}
+#bar.on{opacity:1}
+@keyframes slide{from{background-position:-50% 0}to{background-position:150% 0}}
+header{position:sticky;top:0;background:var(--pri);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:8px;z-index:2}
+@media(prefers-color-scheme:dark){header{color:#06201d}}
+header div{flex:1;line-height:1.2}
+header h1{font-size:19px;margin:0}
+header span{font-size:12px;opacity:.85}
+main{padding:12px 16px 90px;max-width:640px;margin:auto}
+.hide{display:none!important}
+input,select,button{font:inherit;color:inherit}
+input,select{width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--card);margin:4px 0 12px}
+input:focus,select:focus,button:focus-visible{outline:3px solid var(--acc);outline-offset:1px}
+label{font-size:14px;color:var(--mut)}
+button{border:0;border-radius:8px;padding:12px 16px;background:var(--pri);color:#fff;font-weight:600;cursor:pointer}
+button:disabled{opacity:.6}
+@media(prefers-color-scheme:dark){button{color:#06201d}}
+button.ghost{background:transparent;color:var(--pri);border:1px solid var(--pri)}
+button.del{background:var(--err);color:#fff}
+header button{background:transparent;color:inherit;border:1px solid currentColor;padding:6px 12px}
+.fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));background:var(--acc);color:#14282a;box-shadow:0 2px 8px #0004;padding:14px 20px;border-radius:28px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.u{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:6px;margin:6px 0;padding:8px 10px}
+.u.off{border-left-color:var(--mut);opacity:.75}
+.u b{font-size:17px;margin-right:6px;overflow-wrap:anywhere}
+.tag{display:inline-block;padding:0 8px;border-radius:10px;background:var(--acc);color:#14282a;font-size:12px;font-weight:600;line-height:1.5;margin-right:4px}
+.tag.t{background:var(--line);color:var(--ink)}
+.tag.x{background:var(--err);color:#fff}
+.acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.acts button{flex:1;padding:6px 8px;font-size:13px;white-space:nowrap}
+.hint{color:var(--mut);font-size:13px;margin:0 0 10px}
+#msg{color:var(--err);min-height:1.5em;margin:0 0 8px}
+#msg.ok{color:var(--ok)}
+#dlg{position:fixed;inset:0;z-index:30;background:#000a;display:flex;align-items:center;justify-content:center;padding:20px}
+#dlg .box{background:var(--card);color:var(--ink);border-radius:12px;padding:18px;width:100%;max-width:360px;max-height:90vh;overflow:auto;box-shadow:0 8px 30px #0008}
+#dlg h2{font-size:18px;margin:0 0 10px}
+#dlg p{margin:0 0 12px;overflow-wrap:anywhere;white-space:pre-line}
+#dlgE{color:var(--err);min-height:1.2em;margin:0 0 8px;font-size:14px}
+.pinrow{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start}
+.pinrow button{margin-top:4px;padding:12px}
+.big{font:700 30px/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:3px;text-align:center;background:var(--bg);border:1px dashed var(--acc);border-radius:8px;padding:12px;margin:0 0 12px;user-select:all}
+.empty{color:var(--mut);text-align:center;padding:32px 0}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<header><div><h1>จัดการผู้ใช้</h1><span>CMLTS · เฉพาะผู้ดูแล</span></div><button id="out" class="hide">EXIT</button></header>
+<main>
+<p id="msg" role="alert"></p>
+
+<section id="vLogin">
+  <p class="hint">เข้าสู่ระบบด้วยบัญชีผู้ดูแล (admin) เท่านั้น</p>
+  <label for="u">NAME</label><input id="u" autocomplete="username" autocapitalize="none">
+  <label for="p">PIN</label><input id="p" type="password" inputmode="numeric" autocomplete="current-password">
+  <button id="go" style="width:100%">GO</button>
+</section>
+
+<section id="vUsers" class="hide">
+  <p class="hint" id="cap"></p>
+  <div id="list"></div>
+  <button id="add" class="fab">+ เพิ่มผู้ใช้</button>
+</section>
+</main>
+
+<div id="dlg" class="hide" role="dialog" aria-modal="true" aria-labelledby="dlgT">
+  <div class="box">
+    <h2 id="dlgT"></h2>
+    <p id="dlgM"></p>
+    <div id="fName"><label for="nm">ชื่อผู้ใช้ (2-20 ตัว: ตัวอักษร ตัวเลข . _ -)</label><input id="nm" maxlength="20" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"></div>
+    <div id="fPin"><label for="pn">PIN (ตัวเลข 6-12 หลัก)</label>
+      <div class="pinrow"><input id="pn" inputmode="numeric" maxlength="12" autocomplete="off"><button id="rnd" type="button" class="ghost">สุ่ม</button></div></div>
+    <div id="fRole"><label for="rl">สิทธิ์</label><select id="rl"><option value="tech">ช่าง (tech)</option><option value="admin">ผู้ดูแล (admin)</option></select></div>
+    <div class="big hide" id="shown"></div>
+    <p id="dlgE" role="alert"></p>
+    <div class="two"><button id="dlgNo" class="ghost">ยกเลิก</button><button id="dlgYes">ตกลง</button></div>
+  </div>
+</div>
+
+<script>
+if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('framed'); }   // กันถูกฝังในเว็บอื่น (clickjacking)
+const API = 'https://script.google.com/macros/s/AKfycbyBriSISb1kM9tuLvEmXhCNqQn-Dw-ZyEZ-oBOYr8rCmNSfCU0FvdVknxT323EktpoK/exec';
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let token = null, me = null, users = [], pending = 0;   // token อยู่ในหน่วยความจำเท่านั้น (รีเฟรชหน้า = ต้องเข้าสู่ระบบใหม่)
+
+function say(t, ok){ $('msg').textContent = t || ''; $('msg').className = ok ? 'ok' : ''; }
+function view(v){ $('vLogin').classList.toggle('hide', v !== 'vLogin'); $('vUsers').classList.toggle('hide', v !== 'vUsers'); $('out').classList.toggle('hide', v === 'vLogin'); }
+
+async function api(action, data = {}){
+  pending++; $('bar').classList.add('on');
+  try{
+    const r = await fetch(API, {method:'POST', body: JSON.stringify({action, token, ...data})});
+    const j = await r.json();
+    if (j.auth) logout(j.error);
+    return j;
+  }catch(e){ return {ok:false, error:'เชื่อมต่อไม่ได้ ตรวจสอบสัญญาณแล้วลองใหม่'}; }
+  finally{ if (--pending <= 0) { pending = 0; $('bar').classList.remove('on'); } }
+}
+async function busy(b, txt, fn){
+  const old = b.textContent; b.disabled = true; b.textContent = txt;
+  try{ return await fn(); } finally { b.disabled = false; b.textContent = old; }
+}
+function logout(m){ token = null; me = null; users = []; $('p').value = ''; $('list').innerHTML = ''; closeDlg(); view('vLogin'); say(m); }
+
+$('go').onclick = () => busy($('go'), 'กำลังเข้าสู่ระบบ…', async () => {
+  say();
+  const j = await api('login', {user: $('u').value, pin: $('p').value});
+  $('p').value = '';
+  if (!j.ok) return say(j.error);
+  if (!j.user || j.user.role !== 'admin') { token = null; return say('บัญชีนี้ไม่ใช่ผู้ดูแลระบบ'); }
+  token = j.token; me = j.user; view('vUsers'); load();
+});
+$('p').addEventListener('keydown', e => { if (e.key === 'Enter') $('go').click(); });
+function bye(){ if (token) fetch(API, {method:'POST', body: JSON.stringify({action:'logout', token})}).catch(() => {}); }   // ยกเลิกเซสชันฝั่งเซิร์ฟเวอร์ด้วย
+$('out').onclick = () => { bye(); logout(); };
+
+async function load(){
+  $('list').innerHTML = '<p class="empty">กำลังโหลด…</p>';
+  const j = await api('users');
+  if (!j.ok) { $('list').innerHTML = ''; return say(j.error); }
+  users = j.users; draw();
+}
+
+function draw(){
+  const on = users.filter(u => u.active).length;
+  $('cap').textContent = 'ผู้ใช้ทั้งหมด ' + users.length + ' คน · ใช้งานอยู่ ' + on + ' คน · เข้าสู่ระบบเป็น ' + me.name;
+  $('list').innerHTML = users.length ? users.map((u, i) => {
+    const self = u.name.toLowerCase() === me.name.toLowerCase();
+    return `<div class="u ${u.active ? '' : 'off'}" data-i="${i}">
+      <b>${esc(u.name)}</b><span class="tag ${u.role === 'admin' ? '' : 't'}">${u.role === 'admin' ? 'ผู้ดูแล' : 'ช่าง'}</span>${u.active ? '' : '<span class="tag x">ปิดใช้งาน</span>'}${self ? '<span class="tag t">คุณ</span>' : ''}
+      <div class="acts">
+        <button class="ghost" data-a="pin">ตั้ง PIN ใหม่</button>
+        <button class="ghost" data-a="role">เปลี่ยนสิทธิ์</button>
+        ${self ? '' : `<button class="${u.active ? 'del' : 'ghost'}" data-a="act">${u.active ? 'ปิดใช้งาน' : 'เปิดใช้งาน'}</button>`}
+      </div></div>`;
+  }).join('') : '<p class="empty">ยังไม่มีผู้ใช้</p>';
+}
+
+/* ---------- กล่องโต้ตอบ ---------- */
+let dlgSubmit = null;
+function closeDlg(){ $('dlg').classList.add('hide'); dlgSubmit = null; $('pn').value = ''; $('nm').value = ''; }
+function pinRand(){
+  const a = new Uint32Array(1); crypto.getRandomValues(a);
+  return String(a[0] % 1000000).padStart(6, '0');
+}
+/* cfg: {title, msg, name, pin, role, yes, danger, run(values) -> Promise<{ok,error}>, after(values)} */
+function dlg(cfg){
+  $('dlgT').textContent = cfg.title; $('dlgM').textContent = cfg.msg || ''; $('dlgM').classList.toggle('hide', !cfg.msg);
+  $('fName').classList.toggle('hide', !cfg.name); $('fPin').classList.toggle('hide', !cfg.pin); $('fRole').classList.toggle('hide', !cfg.role);
+  $('shown').classList.add('hide'); $('dlgE').textContent = ''; $('dlgNo').classList.remove('hide');
+  $('nm').value = ''; $('pn').value = cfg.pin ? pinRand() : ''; $('rl').value = cfg.roleVal || 'tech';
+  const y = $('dlgYes'); y.textContent = cfg.yes || 'ตกลง'; y.className = cfg.danger ? 'del' : ''; y.disabled = false;
+  $('dlg').classList.remove('hide');
+  (cfg.name ? $('nm') : cfg.pin ? $('pn') : y).focus();
+  dlgSubmit = async () => {
+    const v = {name: $('nm').value.trim(), pin: $('pn').value.trim(), role: $('rl').value};
+    $('dlgE').textContent = ''; y.disabled = true; const old = y.textContent; y.textContent = 'กำลังบันทึก…';
+    const j = await cfg.run(v);
+    y.disabled = false; y.textContent = old;
+    if (!j.ok) { $('dlgE').textContent = j.error || 'ไม่สำเร็จ'; return; }
+    users = j.users; draw();
+    if (cfg.showPin) {      /* แสดง PIN ครั้งเดียว: ระบบเก็บเป็น hash ดูย้อนหลังไม่ได้ */
+      $('dlgT').textContent = 'สำเร็จ · จด PIN นี้ไว้';
+      $('dlgM').textContent = 'ผู้ใช้: ' + (v.name || cfg.who) + '\nแจ้งช่างให้เข้าระบบด้วย PIN นี้ ระบบไม่เก็บ PIN จริง จึงดูซ้ำไม่ได้';
+      $('dlgM').classList.remove('hide');
+      ['fName','fPin','fRole'].forEach(x => $(x).classList.add('hide'));
+      $('shown').textContent = v.pin; $('shown').classList.remove('hide');
+      $('dlgNo').classList.add('hide'); y.textContent = 'ปิด'; y.className = '';
+      dlgSubmit = () => closeDlg();
+    } else closeDlg();
+  };
+}
+$('dlgYes').onclick = () => dlgSubmit && dlgSubmit();
+$('dlgNo').onclick = closeDlg;
+$('rnd').onclick = () => { $('pn').value = pinRand(); };
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('dlg').classList.contains('hide') && $('shown').classList.contains('hide')) closeDlg(); });
+
+$('add').onclick = () => dlg({
+  title: 'เพิ่มผู้ใช้ใหม่', name: true, pin: true, role: true, yes: 'เพิ่มผู้ใช้', showPin: true,
+  run: v => api('user_add', {name: v.name, pin: v.pin, role: v.role})
+});
+
+$('list').onclick = e => {
+  const b = e.target.closest('button[data-a]'); if (!b) return;
+  const u = users[+b.closest('.u').dataset.i]; if (!u) return;
+  if (b.dataset.a === 'pin') dlg({
+    title: 'ตั้ง PIN ใหม่', msg: 'ผู้ใช้: ' + u.name + '\nPIN เดิมจะใช้ไม่ได้ และเซสชันเดิมของผู้ใช้นี้จะถูกบังคับออกจากระบบ',
+    pin: true, yes: 'ตั้ง PIN', showPin: true, who: u.name,
+    run: v => api('user_edit', {name: u.name, pin: v.pin})
+  });
+  if (b.dataset.a === 'role') dlg({
+    title: 'เปลี่ยนสิทธิ์', msg: 'ผู้ใช้: ' + u.name, role: true, roleVal: u.role, yes: 'บันทึก',
+    run: v => v.role === u.role ? Promise.resolve({ok: false, error: 'สิทธิ์เหมือนเดิม'}) : api('user_edit', {name: u.name, role: v.role})
+  });
+  if (b.dataset.a === 'act') dlg({
+    title: u.active ? 'ปิดใช้งานผู้ใช้?' : 'เปิดใช้งานผู้ใช้?',
+    msg: u.active ? 'ผู้ใช้: ' + u.name + '\nจะเข้าระบบไม่ได้ และถูกบังคับออกจากระบบทันที (ข้อมูลที่เคยบันทึกยังอยู่ครบ)' : 'ผู้ใช้: ' + u.name + '\nจะกลับมาเข้าระบบได้ด้วย PIN เดิม',
+    yes: u.active ? 'ปิดใช้งาน' : 'เปิดใช้งาน', danger: u.active,
+    run: () => api('user_active', {name: u.name, active: !u.active})
+  });
+};
+
+view('vLogin');
+</script>
+</body>
+</html>
