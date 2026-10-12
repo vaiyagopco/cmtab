@@ -144,6 +144,7 @@ a.btn{display:block;padding:10px;border:1px solid var(--pri);border-radius:8px;c
 <div id="big" class="hide"><div id="bigBox"></div></div>
 
 <script>
+if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('framed'); }   // กันถูกฝังในเว็บอื่น (clickjacking)
 const API = 'https://script.google.com/macros/s/AKfycbyBriSISb1kM9tuLvEmXhCNqQn-Dw-ZyEZ-oBOYr8rCmNSfCU0FvdVknxT323EktpoK/exec';
 const PAINS = ['ออนไลน์ปกติ','สายขาด','สายหัก/งอ','อุปกรณ์เสีย','งานติดตั้งใหม่(NEW)','เน็ตช้า/หลุดบ่อย','IPCAM(Cloud)','อื่นๆ'];
 const DRUMS = ['ZT cable','Shenzhen','Hulli cable','Fiberhome','FIBRE3','Change','Chang Yun','AWN'];
@@ -250,7 +251,8 @@ $('go').onclick = () => busy($('go'), 'กำลังเข้าสู่ร�
   sessionStorage.setItem('t', token); sessionStorage.setItem('u', JSON.stringify(me));
   goHome();
 });
-$('out').onclick = () => logout();
+function bye(){ if (token) fetch(API, {method:'POST', body: JSON.stringify({action:'logout', token})}).catch(() => {}); }   // ยกเลิกเซสชันฝั่งเซิร์ฟเวอร์ด้วย
+$('out').onclick = () => { bye(); logout(); };
 $('home').onclick = () => goHome();
 
 /* ---------- หน้าแรก: เครื่องมือ ---------- */
