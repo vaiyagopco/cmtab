@@ -29,3 +29,34 @@ body{font:16px/1.5 system-ui,-apple-system,"Noto Sans Thai","Sarabun",sans-serif
 .hide{display:none!important}
 
 /* ---------- หัวเว็บ ---------- */
+#bar{position:fixed;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,transparent,var(--o),transparent) no-repeat;background-size:50% 100%;animation:slide 1s linear infinite;opacity:0;transition:opacity .15s;z-index:50;pointer-events:none}
+  const b = $('gps'), old = b.innerHTML; b.disabled = true; b.textContent = 'กำลังจับพิกัด…'; say();
+  navigator.geolocation.getCurrentPosition(p => {
+    b.disabled = false; b.innerHTML = old;
+    $('pin').value = p.coords.latitude.toFixed(6) + ',' + p.coords.longitude.toFixed(6);
+    say(p.coords.accuracy > 50 ? 'ความแม่นยำ ±' + Math.round(p.coords.accuracy) + ' ม. ลองจับใหม่กลางแจ้ง' : '');
+  }, () => { b.disabled = false; b.innerHTML = old; say('จับพิกัดไม่ได้ ตรวจสอบสิทธิ์ตำแหน่งของเบราว์เซอร์'); },
+  {enableHighAccuracy:true, timeout:15000});
+};
+
+function upsert(item){
+  [rows, allRows, found].forEach((arr, k) => {
+    if (!arr) return;
+    const i = arr.findIndex(x => x.id === item.id);
+    if (i >= 0) arr[i] = item; else if (k < 2) arr.unshift(item);
+  });
+}
+
+$('save').onclick = () => busy($('save'), 'กำลังบันทึก…', async () => {
+  say();
+  const rec = {id: $('id').value, sn: keepSn}; F.forEach(k => rec[k] = $(k).value.trim());
+  if (!/^(888|880)\d+$/.test(rec.net)) return say('Internet No. ต้องเป็นตัวเลขและขึ้นต้นด้วย 888 หรือ 880');
+  const j = await api('save', {rec});
+  if (!j.ok) return say(j.error);
+  upsert(j.item); formSeq++; view('vList'); draw(); window.scrollTo(0, 0);
+});
+
+if (token && me) { goHome(); ping(); } else { view('vLogin'); ping(); }
+</script>
+</body>
+</html>
