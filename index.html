@@ -30,6 +30,546 @@ body{font:16px/1.5 system-ui,-apple-system,"Noto Sans Thai","Sarabun",sans-serif
 
 /* ---------- หัวเว็บ ---------- */
 #bar{position:fixed;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,transparent,var(--o),transparent) no-repeat;background-size:50% 100%;animation:slide 1s linear infinite;opacity:0;transition:opacity .15s;z-index:50;pointer-events:none}
+#bar.on{opacity:1}
+@keyframes slide{from{background-position:-50% 0}to{background-position:150% 0}}
+header{position:sticky;top:0;z-index:20;background:var(--dark);color:#fff;padding:calc(8px + env(safe-area-inset-top)) 14px 8px;min-height:58px;display:flex;align-items:center;gap:10px;border-bottom:3px solid var(--g)}
+.mark{width:36px;height:36px;border-radius:10px;background:var(--g);color:var(--on-g);display:grid;place-items:center;flex:none}
+.mark .ic{width:22px;height:22px}
+header .t{flex:1;min-width:0;line-height:1.15}
+header h1{font-size:19px;margin:0;letter-spacing:.5px}
+header span{font-size:12px;color:var(--g)}
+header button{display:flex;align-items:center;gap:6px;background:transparent;color:#fff;border:1.5px solid #ffffff55;border-radius:10px;padding:7px 10px;font-size:13px;font-weight:600;cursor:pointer}
+header button .ic{width:18px;height:18px}
+header button:active{background:#ffffff22}
+
+main{padding:14px 14px 100px;max-width:640px;margin:auto}
+#msg{color:var(--err);font-weight:600;margin:0 0 8px;min-height:0}
+#msg:empty{display:none}
+
+/* ---------- ฟอร์มพื้นฐาน ---------- */
+input,textarea,select,button{font:inherit;color:inherit}
+input,textarea,select{width:100%;padding:12px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);margin:4px 0 14px}
+input:disabled,textarea:disabled,select:disabled{opacity:.55}
+input:focus,textarea:focus,select:focus,button:focus-visible,a:focus-visible{outline:3px solid var(--g);outline-offset:1px;border-color:var(--gd)}
+label{display:block;font-size:13px;font-weight:600;color:var(--mut)}
+label i{color:var(--o);font-style:normal;font-size:16px}
+button{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:0;border-radius:12px;padding:13px 16px;background:var(--g);color:var(--on-g);font-weight:700;cursor:pointer}
+button:active:not(:disabled){transform:scale(.98)}
+button:disabled{opacity:.55}
+button.ghost{background:transparent;color:var(--gd);border:1.5px solid var(--gd)}
+button.del{background:transparent;color:var(--err);border:1.5px solid var(--err)}
+button.big{width:100%;font-size:18px;padding:15px}
+.hint{color:var(--mut);min-height:1.5em;margin:4px 0 12px;font-size:14px}
+.hint.bad{color:var(--err);font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* ---------- เข้าสู่ระบบ ---------- */
+.login{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px 18px;margin-top:18px;box-shadow:0 6px 22px #0000000f}
+.login .mark{width:56px;height:56px;border-radius:16px;margin:0 auto 6px}
+.login .mark .ic{width:32px;height:32px}
+.login h2{margin:0 0 14px;text-align:center;font-size:20px}
+.login input{font-size:18px;padding:14px}
+
+/* ---------- หน้าแรก ---------- */
+.who{display:flex;align-items:center;gap:10px;margin:2px 2px 14px;color:var(--mut)}
+.who .av{width:38px;height:38px;border-radius:50%;background:var(--soft);color:var(--gd);display:grid;place-items:center}
+.who b{color:var(--ink);font-size:17px;display:block;line-height:1.2}
+.tag{display:inline-block;padding:0 9px;border-radius:10px;background:var(--o);color:var(--on-o);font-size:12px;font-weight:700;line-height:1.55}
+.tag.g{background:var(--g);color:var(--on-g)}
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tool{display:flex;align-items:center;gap:14px;text-align:left;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:0 2px 10px #0000000d;width:100%}
+.tool .tile{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;flex:none;background:var(--dark);color:var(--g)}
+.tool .tile .ic{width:26px;height:26px}
+.tool b{display:block;font-size:18px;line-height:1.2}
+.tool small{display:block;color:var(--mut);font-size:13px;font-weight:500;margin-top:2px}
+.tool.feat{grid-column:1/-1;flex-direction:column;align-items:flex-start;gap:12px;min-height:150px;justify-content:space-between;padding:20px;border:0;color:var(--on-g);background:linear-gradient(135deg,#c4e043 0%,#B2D235 55%,#9cc21c 100%);box-shadow:0 8px 22px #8fb11f55}
+.tool.feat .tile{width:60px;height:60px;border-radius:18px;background:var(--dark);color:var(--g)}
+.tool.feat .tile .ic{width:32px;height:32px}
+.tool.feat b{font-size:28px;letter-spacing:.3px}
+.tool.feat small{color:#2c3a14;font-size:15px}
+.tool.feat .go{align-self:flex-end;display:flex;align-items:center;gap:6px;font-weight:700;font-size:15px;margin-top:-34px}
+.tool.sec{flex-direction:column;align-items:flex-start;gap:10px;min-height:128px}
+.tool.sec .tile.o{background:var(--o);color:var(--on-o)}
+.tool:active{transform:scale(.985)}
+
+/* ---------- รายการ ---------- */
+.sticky{position:sticky;top:61px;z-index:10;background:var(--bg);margin:-14px -14px 4px;padding:12px 14px 6px}
+.search{display:flex;align-items:center;gap:8px;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:0 12px;color:var(--mut)}
+.search input::placeholder{font-size:13px}
+.search:focus-within{border-color:var(--gd);outline:3px solid var(--g)}
+.search input{border:0;margin:0;padding:12px 0;background:transparent;outline:0;min-width:0;font-size:15px}
+.lbar{display:flex;align-items:center;gap:8px;margin:8px 0 0}
+.lbar span{flex:1;color:var(--mut);font-size:13px;font-weight:600}
+.lbar button{padding:6px 12px;font-size:13px;border-radius:10px}
+.dh{margin:12px 2px 4px;color:var(--gd);font-size:12px;font-weight:700;letter-spacing:.4px}
+.item{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--g);border-radius:12px;margin:6px 0;overflow:hidden}
+.item.open{border-left-color:var(--o);box-shadow:0 4px 14px #0000001a}
+.head{display:flex;align-items:center;gap:8px;padding:8px 8px 8px 12px;cursor:pointer}
+.hl{flex:1;min-width:0}
+.l1{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px}
+.l1 b{font-size:21px;line-height:1.25;letter-spacing:.4px;font-variant-numeric:tabular-nums}
+.dt{display:block;color:var(--mut);font-size:12px;line-height:1.3;overflow-wrap:anywhere}
+.chev{width:36px;height:36px;padding:0;border-radius:50%;background:var(--soft);color:var(--gd);flex:none}
+.chev .ic{transition:transform .15s}
+.item.open .chev .ic{transform:rotate(180deg)}
+.detail{display:none;padding:2px 12px 12px;border-top:1px solid var(--line)}
+.item.open .detail{display:block}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin:10px 0}
+.kv div{min-width:0}
+.kv dt{font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.5px}
+.kv dd{margin:0;font-size:15px;overflow-wrap:anywhere}
+.note{margin:0 0 10px;padding:10px 12px;background:var(--soft);border-radius:10px;white-space:pre-wrap;word-break:break-word}
+a.btn.go{display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;background:var(--g);color:var(--on-g);font-weight:800;font-size:17px;padding:14px;border-radius:12px;margin-bottom:8px}
+.row{display:flex;gap:8px}
+.row>*{flex:1;padding:10px 6px;font-size:14px;white-space:nowrap}
+.row>[data-a=again]{flex:1.7}
+.empty{color:var(--mut);text-align:center;padding:40px 0}
+.empty .ic{opacity:.6}
+.fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:15;background:var(--o);color:var(--on-o);box-shadow:0 6px 18px #f5822066;padding:16px 22px;border-radius:30px;font-size:17px}
+.fab .ic{width:22px;height:22px;stroke-width:2.6}
+
+/* ---------- ฟอร์มข้อมูล ---------- */
+.fmode{display:inline-flex;align-items:center;gap:6px;margin:0 0 12px;padding:5px 12px;border-radius:20px;background:var(--soft);color:var(--gd);font-size:13px;font-weight:700}
+.fmode:empty{display:none}
+.fs{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 14px 2px;margin:0 0 12px}
+.fs h3{margin:0 0 8px;font-size:12px;letter-spacing:.8px;color:var(--gd);text-transform:uppercase;display:flex;align-items:center;gap:6px}
+#net{font-size:24px;font-weight:800;letter-spacing:1px;padding:14px;border-color:var(--gd);font-variant-numeric:tabular-nums}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:-6px 0 14px}
+.chips:empty{display:none}
+.chips button{padding:7px 12px;font-size:14px;font-weight:600;border-radius:18px;background:var(--soft);color:var(--ink);border:1.5px solid transparent}
+.chips button.on{background:var(--g);color:var(--on-g);border-color:var(--gd)}
+#gps{width:100%;margin:-6px 0 14px}
+.actions{position:sticky;bottom:0;z-index:5;display:grid;grid-template-columns:1fr 2fr;gap:10px;padding:14px 0 calc(8px + env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--bg) 28%)}
+.actions button{font-size:17px;padding:15px}
+
+/* ---------- Barcode ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 14px 4px}
+#bt{font:700 22px/1.2 ui-monospace,Menlo,Consolas,monospace;padding:14px;letter-spacing:1px}
+.bc{background:#fff;border:1.5px dashed var(--line);border-radius:10px;padding:8px;margin:0 0 8px;cursor:zoom-in}
+.bc:empty{display:none}
+.bc svg{display:block;width:100%;height:96px}
+#big{position:fixed;inset:0;background:#fff;color:#000;z-index:60;display:flex;align-items:center;justify-content:center;padding:16px;text-align:center;cursor:zoom-out}
+#bigBox{width:100%;max-width:900px}
+#bigBox svg{display:block;width:100%;height:30vh;min-height:120px}
+.bigt{font:600 22px/1.3 ui-monospace,Menlo,Consolas,monospace;margin-top:12px;overflow-wrap:anywhere}
+.bigh{font-size:13px;color:#555;margin:12px 0 0}
+
+/* ---------- ป๊อปอัพ ---------- */
+#dlg{position:fixed;inset:0;z-index:70;background:#000a;display:flex;align-items:center;justify-content:center;padding:20px}
+#dlg .box{background:var(--card);color:var(--ink);border-radius:18px;padding:20px;width:100%;max-width:340px;box-shadow:0 10px 36px #0009}
+#dlg b{font-size:19px;color:var(--err);display:flex;align-items:center;gap:8px}
+#dlg p{margin:10px 0 18px;overflow-wrap:anywhere;white-space:pre-line}
+#dlg button.del.solid{background:var(--err);color:#fff;border-color:var(--err)}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 9.5V20h5v-6h4v6h5V9.5"/></symbol>
+  <symbol id="i-out" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 4h6a1 1 0 0 1 1 1v1H8V5a1 1 0 0 1 1-1zM8 6H6a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-2M9 12h6M9 16h6"/></symbol>
+  <symbol id="i-bar" viewBox="0 0 24 24"><path d="M4 5v14M7.5 5v14M11 5v14M15 5v14M18.5 5v14M21 5v14" /></symbol>
+  <symbol id="i-tree" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.3"/><circle cx="5" cy="19" r="2.3"/><circle cx="19" cy="19" r="2.3"/><path d="M12 7.3V12M12 12l-5.3 5M12 12l5.3 5"/></symbol>
+  <symbol id="i-nav" viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8-8-2z"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 10v6M14 10v6"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+  <symbol id="i-dl" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></symbol>
+  <symbol id="i-zoom" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></symbol>
+  <symbol id="i-gps" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-1a5 5 0 0 0-5-5H9a5 5 0 0 0-5 5v1M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24"><path d="M14 3h7v7M21 3l-9 9M10 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3l10 18H2zM12 10v5M12 18.5v.01"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+</svg>
+<div id="bar"></div>
+<header>
+  <div class="mark"><svg class="ic"><use href="#i-tree"/></svg></div>
+  <div class="t"><h1>CMLTS</h1><span>CM Tool</span></div>
+  <button id="home" class="hide"><svg class="ic"><use href="#i-home"/></svg>HOME</button>
+  <button id="out" class="hide"><svg class="ic"><use href="#i-out"/></svg>EXIT</button>
+</header>
+<main>
+<p id="msg" role="alert"></p>
+
+<section id="vLogin">
+  <div class="login">
+    <div class="mark"><svg class="ic"><use href="#i-tree"/></svg></div>
+    <h2>เข้าสู่ระบบ</h2>
+    <label for="u">NAME</label><input id="u" autocomplete="username" autocapitalize="none">
+    <label for="p">PIN</label><input id="p" type="password" inputmode="numeric" autocomplete="current-password">
+    <button id="go" class="big">GO</button>
+  </div>
+</section>
+
+<section id="vHome" class="hide">
+  <div class="who" id="who"><div class="av"><svg class="ic"><use href="#i-user"/></svg></div><div><b id="whoName"></b><span class="tag g" id="whoRole"></span></div></div>
+  <div class="tools">
+    <button class="tool feat" id="toolList"><span class="tile"><svg class="ic"><use href="#i-list"/></svg></span><span><b>CMList</b><small>v1 · บันทึก / ค้นหา / แก้ไขงานซ่อม</small></span><span class="go">เปิด<svg class="ic"><use href="#i-arrow"/></svg></span></button>
+    <button class="tool sec" id="toolBar"><span class="tile"><svg class="ic"><use href="#i-bar"/></svg></span><span><b>Barcode</b><small>GenBC</small></span></button>
+    <a class="tool sec" id="toolSp" href="https://cmltoolbymm.netlify.app/" target="_blank" rel="noopener noreferrer"><span class="tile o"><svg class="ic"><use href="#i-tree"/></svg></span><span><b>Splitter Tree</b><small>SPFDV1</small></span></a>
+  </div>
+</section>
+
+<section id="vBar" class="hide">
+  <div class="card">
+    <label for="bt">SN</label>
+    <input id="bt" maxlength="80" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="เช่น FHTT0A1B2C3D">
+    <div class="bc" id="btPrev" title="แตะเพื่อขยาย"></div>
+    <p class="hint" id="btMsg"></p>
+  </div>
+  <div class="two" style="margin-top:12px"><button id="btBig" class="ghost big" disabled><svg class="ic"><use href="#i-zoom"/></svg>Zoom</button><button id="btDl" class="big" disabled><svg class="ic"><use href="#i-dl"/></svg>Save to PNG</button></div>
+</section>
+
+<section id="vList" class="hide">
+  <div class="sticky">
+    <label class="search"><svg class="ic"><use href="#i-search"/></svg><input id="q" type="search" placeholder="ค้นหา Internet No. / Phone / Drum / SP / Pain point" aria-label="ค้นหา"></label>
+    <div class="lbar"><span id="lcap"></span><button id="hist" type="button" class="ghost"></button></div>
+  </div>
+  <div id="items"></div>
+  <button id="add" class="fab"><svg class="ic"><use href="#i-plus"/></svg>เพิ่มข้อมูล</button>
+</section>
+
+<section id="vForm" class="hide">
+  <p class="fmode" id="fmode"></p>
+  <input type="hidden" id="id">
+  <div class="fs">
+    <h3><svg class="ic"><use href="#i-user"/></svg>ลูกค้า</h3>
+    <label for="net">Internet No. <i>*</i> (888 หรือ 880)</label>
+    <input id="net" inputmode="numeric" maxlength="30" autocomplete="off">
+    <label for="tel">Phone No.</label>
+    <input id="tel" type="tel" inputmode="tel" maxlength="20" autocomplete="off">
+  </div>
+  <div class="fs">
+    <h3><svg class="ic"><use href="#i-pin"/></svg>ตำแหน่ง</h3>
+    <label for="pin">Home Pin (จับพิกัดหรือวางlat,lng)</label>
+    <input id="pin" inputmode="text" placeholder="13.756331,100.501762" autocomplete="off">
+    <button id="gps" type="button" class="ghost"><svg class="ic"><use href="#i-gps"/></svg>พิกัดปัจจุบัน</button>
+  </div>
+  <div class="fs">
+    <h3><svg class="ic"><use href="#i-list"/></svg>งานซ่อม</h3>
+    <label for="pain">Pain point </label>
+    <input id="pain" maxlength="100" autocomplete="off">
+    <div class="chips" id="chips"></div>
+    <label for="drum">Drum No. (Line Type)</label>
+    <input id="drum" maxlength="60" autocomplete="off">
+    <div class="chips" id="drumChips"></div>
+    <label for="sp">SP Code (Splitter Alias)</label><input id="sp" maxlength="60" autocomplete="off">
+    <label for="plate">Name Plate</label>
+    <select id="plate"><option value="">ไม่ระบุ</option><option value="มี">มี</option><option value="ไม่มี">ไม่มี</option></select>
+    <label for="note">Drop Details (หมายเหตุ)</label>
+    <textarea id="note" rows="8" maxlength="2000"></textarea>
+  </div>
+  <div class="actions"><button id="cancel" class="ghost"><svg class="ic"><use href="#i-x"/></svg>ยกเลิก</button><button id="save"><svg class="ic"><use href="#i-check"/></svg>บันทึก</button></div>
+</section>
+</main>
+
+<div id="dlg" class="hide" role="dialog" aria-modal="true" aria-labelledby="dlgT"><div class="box"><b id="dlgT"><svg class="ic"><use href="#i-warn"/></svg>ยืนยันการลบ</b><p id="dlgM"></p><div class="two"><button id="dlgNo" class="ghost">ยกเลิก</button><button id="dlgYes" class="del solid">ลบถาวร</button></div></div></div>
+<div id="big" class="hide"><div id="bigBox"></div></div>
+
+<script>
+if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('framed'); }   // กันถูกฝังในเว็บอื่น (clickjacking)
+const API = 'https://script.google.com/macros/s/AKfycbyBriSISb1kM9tuLvEmXhCNqQn-Dw-ZyEZ-oBOYr8rCmNSfCU0FvdVknxT323EktpoK/exec';
+const PAINS = ['ออนไลน์ปกติ','สายขาด','สายหัก/งอ','อุปกรณ์เสีย','งานติดตั้งใหม่(NEW)','เน็ตช้า/หลุดบ่อย','IPCAM(Cloud)','อื่นๆ'];
+const DRUMS = ['ZT cable','Shenzhen','Hulli cable','Fiberhome','FIBRE3','Change','Chang Yun','AWN'];
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+/* แสดงเฉพาะวันที่ yyyy-mm-dd */
+function fd(s){ const m = /^(\d{4}-\d\d-\d\d)/.exec(String(s || '')); return m ? m[1] : String(s || ''); }
+
+/*BC-START*/
+/* Code 128 (ชุดอักขระ B) → SVG : ตาราง 107 รูปแบบ (ค่า 0-102 ข้อมูล, 103-105 Start A/B/C, 106 Stop) */
+const C128 = ['212222','222122','222221','121223','121322','131222','122213','122312','132212','221213','221312','231212','112232','122132','122231','113222','123122','123221','223211','221132','221231','213212','223112','312131','311222','321122','321221','312212','322112','322211','212123','212321','232121','111323','131123','131321','112313','132113','132311','211313','231113','231311','112133','112331','132131','113123','113321','133121','313121','211331','231131','213113','213311','213131','311123','311321','331121','312113','312311','332111','314111','221411','431111','111224','111422','121124','121421','141122','141221','112214','112412','122114','122411','142112','142211','241211','221114','413111','241112','134111','111242','121142','121241','114212','124112','124211','411212','421112','421211','212141','214121','412121','111143','111341','131141','114113','114311','411113','411311','113141','114131','311141','411131','211412','211214','211232','2331112'];
+function code128(text){
+  const vals = [104]; let sum = 104;
+  for (let i = 0; i < text.length; i++){
+    const v = text.charCodeAt(i) - 32;
+    if (v < 0 || v > 94) return '';
+    vals.push(v); sum += v * (i + 1);
+  }
+  vals.push(sum % 103, 106);
+  let m = '';
+  vals.forEach(v => { let bar = true; for (const d of C128[v]) { m += (bar ? '1' : '0').repeat(+d); bar = !bar; } });
+  return m;
+}
+function barcodeSvg(text){
+  const m = code128(String(text || '')); if (!m) return '';
+  const Q = 10, w = m.length + 2 * Q; let r = '';
+  for (let i = 0; i < m.length;) {
+    if (m[i] === '1') { let j = i; while (m[j] === '1') j++; r += `<rect x="${Q + i}" width="${j - i}" height="60"/>`; i = j; }
+    else i++;
+  }
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} 60" preserveAspectRatio="none" role="img" aria-label="barcode"><rect width="${w}" height="60" fill="#fff"/><g fill="#000">${r}</g></svg>`;
+}
+/*BC-END*/
+
+/* สร้างไฟล์ภาพ PNG ของ barcode (ความกว้าง 1 module = 4 พิกเซล พร้อมข้อความใต้แท่ง) */
+function pngBlob(text, cb){
+  const m = code128(text); if (!m) return cb(null);
+  const S = 4, Q = 10, H = 160, T = 20, B = 64;
+  const W = (m.length + 2 * Q) * S, c = document.createElement('canvas');
+  c.width = W; c.height = T + H + B;
+  const x = c.getContext('2d');
+  x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.fillStyle = '#000';
+  for (let i = 0; i < m.length;) {
+    if (m[i] === '1') { let j = i; while (m[j] === '1') j++; x.fillRect((Q + i) * S, T, (j - i) * S, H); i = j; }
+    else i++;
+  }
+  x.font = 'bold 28px ui-monospace,Menlo,Consolas,monospace'; x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.fillText(text, W / 2, T + H + B / 2);
+  c.toBlob(cb, 'image/png');
+}
+
+let token = sessionStorage.getItem('t'), me = JSON.parse(sessionStorage.getItem('u') || 'null');
+let rows = [], allRows = null, found = [], hist = false, seq = 0, timer, pending = 0, formSeq = 0, loaded = false, keepSn = '';
+const SLOW = 'กำลังเชื่อมต่อ… ครั้งแรกอาจใช้เวลาสักครู่';
+
+const VIEWS = ['vLogin','vHome','vBar','vList','vForm'];
+function view(v){
+  VIEWS.forEach(x => $(x).classList.toggle('hide', x !== v));
+  $('out').classList.toggle('hide', v === 'vLogin');
+  $('home').classList.toggle('hide', !(v === 'vList' || v === 'vBar'));
+}
+function say(t){ $('msg').textContent = t || ''; }
+function goHome(){
+  formSeq++; say(); closeBig();
+  $('whoName').textContent = me ? me.name : ''; $('whoRole').textContent = me ? (me.role === 'admin' ? 'ผู้ดูแล' : 'ช่าง') : '';
+  view('vHome');
+}
+
+async function api(action, data = {}){
+  pending++; $('bar').classList.add('on');
+  const slow = setTimeout(() => { if (!$('msg').textContent) say(SLOW); }, 3000);
+  try{
+    const r = await fetch(API, {method:'POST', body: JSON.stringify({action, token, ...data})});
+    const j = await r.json();
+    if (j.auth) logout(j.error);
+    return j;
+  }catch(e){ return {ok:false, error:'เชื่อมต่อไม่ได้ ตรวจสอบสัญญาณแล้วลองใหม่'}; }
+  finally{
+    clearTimeout(slow); if ($('msg').textContent === SLOW) say();
+    if (--pending <= 0) { pending = 0; $('bar').classList.remove('on'); }
+  }
+}
+
+function ping(){ fetch(API, {method:'POST', body:'{"action":"ping"}'}).catch(() => {}); }
+setInterval(() => { if (!document.hidden) ping(); }, 240000);
+
+async function busy(b, txt, fn){
+  const old = b.innerHTML; b.disabled = true; b.textContent = txt;
+  try{ return await fn(); } finally { b.disabled = false; b.innerHTML = old; }
+}
+
+function logout(m){
+  token = null; me = null; rows = []; allRows = null; found = []; hist = false; loaded = false; sessionStorage.clear();
+  $('p').value = ''; $('q').value = ''; $('bt').value = ''; $('items').innerHTML = '';
+  closeBig(); view('vLogin'); say(m);
+}
+
+$('go').onclick = () => busy($('go'), 'กำลังเข้าสู่ระบบ…', async () => {
+  say();
+  const j = await api('login', {user: $('u').value, pin: $('p').value});
+  $('p').value = '';
+  if (!j.ok) return say(j.error);
+  token = j.token; me = j.user; rows = j.rows || []; loaded = true;
+  sessionStorage.setItem('t', token); sessionStorage.setItem('u', JSON.stringify(me));
+  goHome();
+});
+function bye(){ if (token) fetch(API, {method:'POST', body: JSON.stringify({action:'logout', token})}).catch(() => {}); }   // ยกเลิกเซสชันฝั่งเซิร์ฟเวอร์ด้วย
+$('out').onclick = () => { bye(); logout(); };
+$('home').onclick = () => goHome();
+
+/* ---------- หน้าแรก: เครื่องมือ ---------- */
+$('toolList').onclick = () => { if (loaded) { view('vList'); draw(); load(true); } else load(); };
+$('toolBar').onclick = () => { say(); view('vBar'); updBar(); $('bt').focus(); };
+
+/* ---------- เครื่องมือ Barcode ---------- */
+const BT_RE = /^[ -~]{1,80}$/;
+let curBlob = null, curText = '', btSeq = 0;
+function btMsg(t, bad){ $('btMsg').textContent = t; $('btMsg').className = 'hint' + (bad ? ' bad' : ''); }
+function updBar(){
+  const t = $('bt').value.trim(), my = ++btSeq;
+  curBlob = null; curText = ''; $('btDl').disabled = true; $('btBig').disabled = true;
+  if (!t) { $('btPrev').innerHTML = ''; return btMsg('พิมพ์ SN'); }
+  if (!BT_RE.test(t)) { $('btPrev').innerHTML = ''; return btMsg('ใช้ได้เฉพาะตัวอักษรอังกฤษ ตัวเลข และสัญลักษณ์ (ไม่รองรับภาษาไทย) ไม่เกิน 80 ตัว', true); }
+  btMsg(''); $('btPrev').innerHTML = barcodeSvg(t); curText = t; $('btBig').disabled = false;
+  pngBlob(t, b => { if (my === btSeq && b) { curBlob = b; $('btDl').disabled = false; } });
+}
+$('bt').oninput = updBar;
+$('btPrev').onclick = () => { if (curText) showBig(curText); };
+$('btBig').onclick = () => { if (curText) showBig(curText); };
+$('btDl').onclick = () => {
+  if (!curBlob) return;
+  const a = document.createElement('a'), u = URL.createObjectURL(curBlob);
+  a.href = u; a.download = 'barcode-' + (curText.replace(/[^A-Za-z0-9._-]+/g, '_').slice(0, 40) || 'code') + '.png';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(u), 5000);
+};
+
+/* barcode เต็มจอ (พื้นขาว) สำหรับให้เครื่องสแกนอ่าน */
+function showBig(sn){
+  const s = barcodeSvg(sn); if (!s) return;
+  $('bigBox').innerHTML = s + '<div class="bigt">' + esc(sn) + '</div><p class="bigh">แตะเพื่อปิด · หมุนจอแนวนอนเพื่อให้สแกนง่ายขึ้น</p>';
+  $('big').classList.remove('hide');
+}
+function closeBig(){ $('big').classList.add('hide'); $('bigBox').innerHTML = ''; }
+$('big').onclick = closeBig;
+
+/* ป๊อปอัพยืนยัน (ของเราเอง ไม่ใช้ confirm ของเบราว์เซอร์) */
+function ask(msg, yes){
+  return new Promise(res => {
+    $('dlgM').textContent = msg; $('dlgYes').textContent = yes || 'ลบถาวร'; $('dlg').classList.remove('hide'); $('dlgNo').focus();
+    const done = v => { $('dlg').classList.add('hide'); $('dlgYes').onclick = $('dlgNo').onclick = $('dlg').onclick = null; res(v); };
+    $('dlgYes').onclick = () => done(true); $('dlgNo').onclick = () => done(false);
+    $('dlg').onclick = e => { if (e.target === $('dlg')) done(false); };
+  });
+}
+
+/* ---------- ข้อมูลลูกค้า ---------- */
+const today = () => new Date().toLocaleDateString('sv-SE', {timeZone: 'Asia/Bangkok'});
+const qv = () => $('q').value.trim();
+
+async function load(quiet){
+  view('vList'); say(); const my = ++seq, q = qv(), all = !q && hist;
+  if (!quiet) $('items').innerHTML = '<div class="empty"><p>กำลังโหลด…</p></div>';
+  const j = await api('list', q ? {q} : all ? {all: true} : {});
+  if (my !== seq) return;
+  if (!j.ok) { if (!quiet) $('items').innerHTML = ''; return say(j.error); }
+  if (q) found = j.rows; else { rows = j.rows; if (all) allRows = j.rows; }
+  loaded = true; draw();
+}
+$('q').oninput = () => { clearTimeout(timer); timer = setTimeout(() => load(true), 400); draw(); };
+$('hist').onclick = () => {
+  hist = !hist; draw();
+  if (hist && !allRows) load(); else load(true);
+};
+
+function mapLink(pin){
+  const [la, ln] = String(pin).split(',').map(Number);
+  return isFinite(la) && isFinite(ln) && pin ? `https://www.google.com/maps/search/?api=1&amp;query=${la},${ln}` : '';
+}
+
+/* เวลา: ถ้าเป็นวันเดียวกับวันของรายการ แสดงเฉพาะ HH:mm */
+function ts(s, base){ const d = fd(s), t = String(s || '').slice(11, 16); return d === base ? t : d + ' ' + t; }
+
+function shown(){
+  if (qv()) return {list: found, cap: 'ผลค้นหา (ทุกวัน) · ' + found.length + ' รายการ', grp: true};
+  if (hist) { const l = allRows || rows; return {list: l, cap: 'ทั้งหมดที่เคยบันทึก · ' + l.length + ' รายการ', grp: true}; }
+  const t = today(), l = rows.filter(r => fd(r.at) === t);
+  return {list: l, cap: 'วันนี้ ' + t + ' · ' + l.length + ' รายการ', grp: false};
+}
+
+const ic = (n, c) => `<svg class="ic${c ? ' ' + c : ''}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+function itemHtml(r){
+  const m = mapLink(r.pin), d0 = fd(r.at);
+  const d1 = r.upAt ? 'แก้ไข: ' + ts(r.upAt, d0) + ' · ' + (r.upBy || '-')
+    : 'บันทึก: ' + String(r.at || '').slice(11, 16) + ' · ' + (r.by || '-');
+  const canDel = me && (me.role === 'admin' || r.by === me.name);
+  const kv = (k, v) => `<div><dt>${k}</dt><dd>${esc(v) || '-'}</dd></div>`;
+  return `<div class="item" data-id="${esc(r.id)}">
+      <div class="head" data-a="tog">
+        <div class="hl"><div class="l1"><b>${esc(r.net)}</b>${r.pain ? `<span class="tag">${esc(r.pain)}</span>` : ''}</div><span class="dt">${esc(d1)}</span></div>
+        <button type="button" class="chev" data-a="tog" aria-expanded="false" aria-label="รายละเอียด">${ic('chev')}</button>
+      </div>
+      <div class="detail">
+        <dl class="kv">${kv('Phone', r.tel)}${kv('Drum', r.drum)}${kv('SP', r.sp)}${kv('Name Plate', r.plate)}</dl>
+        ${r.note ? `<p class="note">${esc(r.note)}</p>` : ''}
+        ${m ? `<a class="btn go" target="_blank" rel="noopener noreferrer" href="${m}">${ic('nav')}นำทาง</a>` : ''}
+        <div class="row">
+          <button class="ghost" data-a="edit">${ic('edit')}แก้ไข</button>
+          <button class="ghost" data-a="again">${ic('plus')}รายการใหม่</button>
+          ${canDel ? `<button class="del" data-a="del" aria-label="ลบ">${ic('trash')}ลบ</button>` : ''}
+        </div>
+      </div></div>`;
+}
+
+function draw(){
+  const s = shown(), cnt = {};
+  s.list.forEach(r => { const d = fd(r.at); cnt[d] = (cnt[d] || 0) + 1; });
+  $('lcap').textContent = s.cap;
+  $('hist').classList.toggle('hide', !!qv());
+  $('hist').textContent = hist ? 'เฉพาะวันนี้' : 'ดูทั้งหมด';
+  let last = null;
+  $('items').innerHTML = s.list.length ? s.list.map(r => {
+    const d = fd(r.at); let h = '';
+    if (s.grp && d !== last) { last = d; h = `<div class="dh">${esc(d)} · ${cnt[d]} รายการ</div>`; }
+    return h + itemHtml(r);
+  }).join('') : '<div class="empty">' + ic('list', 'xl') + '<p>' + (qv() ? 'ไม่พบข้อมูล' : hist ? 'ยังไม่มีข้อมูล' : 'วันนี้ยังไม่มีรายการ<br>กด “+ เพิ่มข้อมูล” หรือ “ดูทั้งหมด”') + '</p></div>';
+}
+
+function setOpen(el, on){
+  el.classList.toggle('open', on);
+  el.querySelector('.head button').setAttribute('aria-expanded', on);
+}
+function toggle(el){
+  const on = !el.classList.contains('open');
+  document.querySelectorAll('.item.open').forEach(x => setOpen(x, false));
+  if (on) { setOpen(el, true); el.scrollIntoView({block:'nearest'}); }
+}
+
+const F = ['net','tel','pin','pain','drum','sp','plate','note'];
+function lock(on){ F.forEach(k => $(k).disabled = on); $('save').disabled = on; $('gps').disabled = on; }
+/* keepSn: เก็บค่า SN เดิมของรายการ (ถ้าเคยบันทึกไว้) เพื่อไม่ให้หายตอนแก้ไข — ไม่แสดงในฟอร์ม */
+function fill(r){ F.forEach(k => $(k).value = r[k] ?? ''); keepSn = r.sn || ''; sync('chips', 'pain'); sync('drumChips', 'drum'); }
+
+function openForm(r, mode){
+  say(); formSeq++; $('id').value = r ? r.id : ''; $('fmode').textContent = mode || (r ? 'แก้ไขรายการเดิม' : 'เพิ่มรายการใหม่');
+  fill(r || {}); lock(false); view('vForm'); window.scrollTo(0, 0);
+  if (!r) $('net').focus();
+}
+
+$('items').onclick = async e => {
+  const b = e.target.closest('[data-a]'); if (!b) return;
+  const el = b.closest('.item'), id = el.dataset.id, r = rows.find(x => x.id === id); if (!r) return;
+  if (b.dataset.a === 'tog') return toggle(el);
+  if (b.dataset.a === 'edit') {
+    openForm(null, 'แก้ไขรายการเดิม'); const my = formSeq;
+    $('id').value = id; lock(true); say('กำลังโหลดข้อมูล…');
+    const j = await api('get', {id});
+    if (my !== formSeq) return;
+    if (!j.ok) { view('vList'); return say(j.error); }
+    fill(j.rec); lock(false); say();
+    return;
+  }
+  if (b.dataset.a === 'again') {
+    openForm(null, 'เพิ่มรายการใหม่ของวันนี้ (คัดข้อมูลลูกค้าจากรายการเดิม ไม่ทับรายการเดิม)'); const my = formSeq;
+    lock(true); say('กำลังโหลดข้อมูล…');
+    const j = await api('get', {id});
+    if (my !== formSeq) return;
+    if (!j.ok) { view('vList'); return say(j.error); }
+    const c = j.rec; fill({net: c.net, tel: c.tel, pin: c.pin, drum: c.drum, sp: c.sp, plate: c.plate}); lock(false); say();
+    $('pain').focus();
+    return;
+  }
+  if (b.dataset.a === 'del') {
+    const ok = await ask('ลบรายการ ' + r.net + '\nบันทึก ' + String(r.at || '') + ' โดย ' + (r.by || '-') + '\n\nลบแล้วกู้คืนไม่ได้ แน่ใจหรือไม่?');
+    if (!ok) return;
+    busy(b, 'กำลังลบ…', async () => {
+      const j = await api('remove', {id});
+      if (j.ok) { const f = x => x.id !== id; rows = rows.filter(f); found = found.filter(f); if (allRows) allRows = allRows.filter(f); draw(); } else say(j.error);
+    });
+  }
+};
+
+/* ปุ่มจิ้มเลือก: Pain point และ Drum No. */
+function chips(box, list){ $(box).innerHTML = list.map(p => `<button type="button">${esc(p)}</button>`).join(''); }
+function sync(box, input){ [...$(box).children].forEach(b => b.classList.toggle('on', b.textContent === $(input).value.trim())); }
+function wire(box, input){
+  $(box).onclick = e => { const b = e.target.closest('button'); if (b) { $(input).value = b.textContent; sync(box, input); } };
+  $(input).addEventListener('input', () => sync(box, input));
+}
+chips('chips', PAINS); wire('chips', 'pain');
+chips('drumChips', DRUMS); wire('drumChips', 'drum');
+
+$('add').onclick = () => openForm();
+$('cancel').onclick = () => { formSeq++; say(); view('vList'); };
+
+$('gps').onclick = () => {
+  if (!navigator.geolocation) return say('เครื่องนี้ไม่รองรับ GPS');
   const b = $('gps'), old = b.innerHTML; b.disabled = true; b.textContent = 'กำลังจับพิกัด…'; say();
   navigator.geolocation.getCurrentPosition(p => {
     b.disabled = false; b.innerHTML = old;
