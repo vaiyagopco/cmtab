@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'">
+<meta name="theme-color" content="#0f3d3e">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex,nofollow">
+<title>CMLTS Pain Point</title>
+<style>
+:root{--bg:#f3f6f5;--card:#fff;--ink:#14282a;--mut:#5d7274;--pri:#0f3d3e;--acc:#e8a317;--line:#d5e0de;--err:#b3261e;--ok:#1b6e3c}
+@media(prefers-color-scheme:dark){:root{--bg:#0d1a1b;--card:#15292a;--ink:#e6f0ee;--mut:#8fa8a6;--pri:#3ba99c;--acc:#f0b73a;--line:#264041;--err:#ff8a80;--ok:#7bd39a}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font:16px/1.5 system-ui,-apple-system,"Noto Sans Thai","Sarabun",sans-serif;background:var(--bg);color:var(--ink);padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+#bar{position:fixed;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,transparent,var(--acc),transparent) no-repeat;background-size:50% 100%;animation:slide 1s linear infinite;opacity:0;transition:opacity .15s;z-index:9;pointer-events:none}
+#bar.on{opacity:1}
+@keyframes slide{from{background-position:-50% 0}to{background-position:150% 0}}
+header{position:sticky;top:0;background:var(--pri);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:8px;z-index:2}
+@media(prefers-color-scheme:dark){header{color:#06201d}}
+header div{flex:1;line-height:1.2}
+header h1{font-size:19px;margin:0}
+header span{font-size:12px;opacity:.85}
+main{padding:12px 16px 90px;max-width:640px;margin:auto}
+.hide{display:none!important}
+input,select,button{font:inherit;color:inherit}
+input{width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--card);margin:4px 0 12px}
+input:focus,button:focus-visible{outline:3px solid var(--acc);outline-offset:1px}
+label{font-size:14px;color:var(--mut)}
+button{border:0;border-radius:8px;padding:12px 16px;background:var(--pri);color:#fff;font-weight:600;cursor:pointer}
+button:disabled{opacity:.45}
+@media(prefers-color-scheme:dark){button{color:#06201d}}
+button.ghost{background:transparent;color:var(--pri);border:1px solid var(--pri)}
+button.del{background:var(--err);color:#fff}
+header button{background:transparent;color:inherit;border:1px solid currentColor;padding:6px 12px}
+.fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));background:var(--acc);color:#14282a;box-shadow:0 2px 8px #0004;padding:14px 20px;border-radius:28px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hint{color:var(--mut);font-size:13px;margin:0 0 10px}
+#msg{color:var(--err);min-height:1.5em;margin:0 0 8px}
+#msg.ok{color:var(--ok)}
+.g{background:var(--card);border:1px solid var(--line);border-radius:10px;margin:12px 0;overflow:hidden}
+.gh{display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--bg);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.gh b{flex:1;min-width:120px;font-size:17px;overflow-wrap:anywhere}
+.s{display:flex;align-items:center;gap:6px;padding:8px 10px;border-top:1px solid var(--line);flex-wrap:wrap}
+.gh+.s{border-top:0}
+.s.off{opacity:.55}
+.dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);flex:none}
+.sn{flex:1;min-width:140px;overflow-wrap:anywhere}
+.tag{display:inline-block;padding:0 8px;border-radius:10px;background:var(--err);color:#fff;font-size:12px;font-weight:600;margin-left:4px}
+.sm{padding:6px 10px;font-size:13px;white-space:nowrap}
+.mv{padding:6px 9px;font-size:13px;line-height:1}
+.sw{display:flex;flex-wrap:wrap;gap:10px;margin:6px 0 14px;align-items:center}
+.sw button{width:38px;height:38px;border-radius:50%;padding:0;border:3px solid transparent}
+.sw button.on{border-color:var(--ink);box-shadow:0 0 0 2px var(--card) inset}
+.sw input{width:44px;height:38px;padding:0;margin:0;border-radius:8px}
+#dlg{position:fixed;inset:0;z-index:30;background:#000a;display:flex;align-items:center;justify-content:center;padding:20px}
+#dlg .box{background:var(--card);color:var(--ink);border-radius:12px;padding:18px;width:100%;max-width:380px;max-height:90vh;overflow:auto;box-shadow:0 8px 30px #0008}
+#dlg h2{font-size:18px;margin:0 0 10px}
+#dlg p{margin:0 0 12px;overflow-wrap:anywhere;white-space:pre-line}
+#dlgE{color:var(--err);min-height:1.2em;margin:0 0 8px;font-size:14px}
+.empty{color:var(--mut);text-align:center;padding:32px 0}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<header><div><h1>จัดการ Pain Point</h1><span>CMLTS · เฉพาะผู้ดูแล</span></div><button id="out" class="hide">EXIT</button></header>
+<main>
+<p id="msg" role="alert"></p>
+
+<section id="vLogin">
+  <p class="hint">เข้าสู่ระบบด้วยบัญชีผู้ดูแล (admin) เท่านั้น</p>
+  <label for="u">NAME</label><input id="u" autocomplete="username" autocapitalize="none">
+  <label for="p">PIN</label><input id="p" type="password" inputmode="numeric" autocomplete="current-password">
+  <button id="go" style="width:100%">GO</button>
+</section>
+
+<section id="vPP" class="hide">
+  <p class="hint" id="cap"></p>
+  <div id="list"></div>
+  <button id="add" class="fab">+ เพิ่มหมวกหลัก</button>
+</section>
+</main>
+
+<div id="dlg" class="hide" role="dialog" aria-modal="true" aria-labelledby="dlgT">
+  <div class="box">
+    <h2 id="dlgT"></h2>
+    <p id="dlgM"></p>
+    <div id="fMain"><label for="mn">หมวกหลัก (1-40 ตัวอักษร)</label><input id="mn" maxlength="40" autocomplete="off"></div>
+    <div id="fSub"><label for="sb">ตัวรอง (1-40 ตัวอักษร)</label><input id="sb" maxlength="40" autocomplete="off"></div>
+    <div id="fCol"><label>สีที่แสดงใน CMList</label><div class="sw" id="sw"></div></div>
+    <p id="dlgE" role="alert"></p>
+    <div class="two"><button id="dlgNo" class="ghost">ยกเลิก</button><button id="dlgYes">ตกลง</button></div>
+  </div>
+</div>
+
+<script>
+if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('framed'); }   // กันถูกฝังในเว็บอื่น (clickjacking)
+const API = 'https://script.google.com/macros/s/AKfycbyBriSISb1kM9tuLvEmXhCNqQn-Dw-ZyEZ-oBOYr8rCmNSfCU0FvdVknxT323EktpoK/exec';
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const HEX = /^#[0-9a-fA-F]{6}$/;
+const PAL = [['เขียว','#43A047'],['ส้ม','#F58220'],['แดง','#D93025'],['เหลือง','#F2C200'],['ฟ้า','#1E88E5'],['ม่วง','#8E44AD'],['ชมพู','#D81B60'],['เทา','#8A8F98']];
+let token = null, me = null, items = [], groups = [], pending = 0, col = '#8A8F98';   // token อยู่ในหน่วยความจำเท่านั้น
+
+function say(t, ok){ $('msg').textContent = t || ''; $('msg').className = ok ? 'ok' : ''; }
+function view(v){ $('vLogin').classList.toggle('hide', v !== 'vLogin'); $('vPP').classList.toggle('hide', v !== 'vPP'); $('out').classList.toggle('hide', v === 'vLogin'); }
+
+async function api(action, data = {}){
+  pending++; $('bar').classList.add('on');
+  try{
+    const r = await fetch(API, {method:'POST', body: JSON.stringify({action, token, ...data})});
+    const j = await r.json();
+    if (j.auth) logout(j.error);
+    return j;
+  }catch(e){ return {ok:false, error:'เชื่อมต่อไม่ได้ ตรวจสอบสัญญาณแล้วลองใหม่'}; }
+  finally{ if (--pending <= 0) { pending = 0; $('bar').classList.remove('on'); } }
+}
+async function busy(b, txt, fn){
+  const old = b.textContent; b.disabled = true; b.textContent = txt;
+  try{ return await fn(); } finally { b.disabled = false; b.textContent = old; }
+}
+function logout(m){ token = null; me = null; items = []; groups = []; $('p').value = ''; $('list').innerHTML = ''; closeDlg(); view('vLogin'); say(m); }
+
+$('go').onclick = () => busy($('go'), 'กำลังเข้าสู่ระบบ…', async () => {
+  say();
+  const j = await api('login', {user: $('u').value, pin: $('p').value});
+  $('p').value = '';
+  if (!j.ok) return say(j.error);
+  if (!j.user || j.user.role !== 'admin') { bye(j.token); token = null; return say('บัญชีนี้ไม่ใช่ผู้ดูแลระบบ'); }
+  token = j.token; me = j.user; view('vPP'); load();
+});
+$('p').addEventListener('keydown', e => { if (e.key === 'Enter') $('go').click(); });
+function bye(t){ if (t) fetch(API, {method:'POST', body: JSON.stringify({action:'logout', token: t})}).catch(() => {}); }   // ยกเลิกเซสชันฝั่งเซิร์ฟเวอร์ด้วย
+$('out').onclick = () => { bye(token); logout(); };
+
+async function load(){
+  $('list').innerHTML = '<p class="empty">กำลังโหลด…</p>';
+  const j = await api('pp_list');
+  if (!j.ok) { $('list').innerHTML = ''; return say(j.error); }
+  items = j.items; draw();
+}
+
+/* จัดกลุ่มตามหมวกหลัก (ลำดับจากเซิร์ฟเวอร์) */
+function draw(){
+  const idx = {}; groups = [];
+  items.forEach((p, i) => {
+    const k = p.main.toLowerCase();
+    if (!(k in idx)) { idx[k] = groups.length; groups.push({main: p.main, subs: []}); }
+    groups[idx[k]].subs.push(i);
+  });
+  const on = items.filter(p => p.active).length;
+  $('cap').textContent = groups.length + ' หมวกหลัก · ' + items.length + ' ตัวรอง (ใช้งาน ' + on + ') · เข้าสู่ระบบเป็น ' + me.name;
+  $('list').innerHTML = groups.length ? groups.map((g, gi) => `<div class="g">
+    <div class="gh"><b>${esc(g.main)}</b>
+      <button class="ghost mv" data-a="gup" data-g="${gi}" title="เลื่อนหมวกขึ้น" ${gi === 0 ? 'disabled' : ''}>▲</button>
+      <button class="ghost mv" data-a="gdn" data-g="${gi}" title="เลื่อนหมวกลง" ${gi === groups.length - 1 ? 'disabled' : ''}>▼</button>
+      <button class="ghost sm" data-a="ren" data-g="${gi}">เปลี่ยนชื่อ</button>
+      <button class="sm" data-a="sub" data-g="${gi}">+ ตัวรอง</button></div>
+    ${g.subs.map((i, si) => { const p = items[i]; return `<div class="s ${p.active ? '' : 'off'}">
+      <span class="dot" style="background:${HEX.test(p.color) ? p.color : '#8A8F98'}"></span>
+      <span class="sn">${esc(p.sub)}${p.active ? '' : '<span class="tag">ปิดใช้งาน</span>'}</span>
+      <button class="ghost mv" data-a="up" data-i="${i}" title="เลื่อนขึ้น" ${si === 0 ? 'disabled' : ''}>▲</button>
+      <button class="ghost mv" data-a="dn" data-i="${i}" title="เลื่อนลง" ${si === g.subs.length - 1 ? 'disabled' : ''}>▼</button>
+      <button class="ghost sm" data-a="ed" data-i="${i}">แก้ไข</button>
+      <button class="${p.active ? 'del' : 'ghost'} sm" data-a="act" data-i="${i}">${p.active ? 'ปิด' : 'เปิด'}</button></div>`; }).join('')}
+  </div>`).join('') : '<p class="empty">ยังไม่มี Pain Point · กด “+ เพิ่มหมวกหลัก”</p>';
+}
+
+/* ---------- กล่องโต้ตอบ ---------- */
+let dlgSubmit = null;
+function closeDlg(){ $('dlg').classList.add('hide'); dlgSubmit = null; $('mn').value = ''; $('sb').value = ''; }
+function paint(){
+  $('sw').innerHTML = PAL.map(c => `<button type="button" class="${c[1] === col ? 'on' : ''}" data-c="${c[1]}" style="background:${c[1]}" aria-label="${esc(c[0])}" title="${esc(c[0])}"></button>`).join('')
+    + `<input type="color" id="cc" value="${col.toLowerCase()}" aria-label="เลือกสีเอง" title="เลือกสีเอง">`;
+}
+$('sw').onclick = e => { const b = e.target.closest('button[data-c]'); if (b) { col = b.dataset.c; paint(); } };
+$('sw').oninput = e => { if (e.target.id === 'cc' && HEX.test(e.target.value)) col = e.target.value.toUpperCase(); };
+$('sw').onchange = e => { if (e.target.id === 'cc') paint(); };
+
+/* cfg: {title,msg,main,sub,color,mainVal,subVal,colorVal,yes,danger,run(values)->Promise<{ok,error,items}>} */
+function dlg(cfg){
+  $('dlgT').textContent = cfg.title; $('dlgM').textContent = cfg.msg || ''; $('dlgM').classList.toggle('hide', !cfg.msg);
+  $('fMain').classList.toggle('hide', !cfg.main); $('fSub').classList.toggle('hide', !cfg.sub); $('fCol').classList.toggle('hide', !cfg.color);
+  $('mn').value = cfg.mainVal || ''; $('sb').value = cfg.subVal || ''; $('dlgE').textContent = '';
+  col = HEX.test(cfg.colorVal) ? cfg.colorVal.toUpperCase() : '#43A047'; if (cfg.color) paint();
+  const y = $('dlgYes'); y.textContent = cfg.yes || 'ตกลง'; y.className = cfg.danger ? 'del' : ''; y.disabled = false;
+  $('dlg').classList.remove('hide');
+  (cfg.main ? $('mn') : cfg.sub ? $('sb') : y).focus();
+  dlgSubmit = async () => {
+    const v = {main: $('mn').value.trim(), sub: $('sb').value.trim(), color: col};
+    $('dlgE').textContent = ''; y.disabled = true; const old = y.textContent; y.textContent = 'กำลังบันทึก…';
+    const j = await cfg.run(v);
+    y.disabled = false; y.textContent = old;
+    if (!j.ok) { $('dlgE').textContent = j.error || 'ไม่สำเร็จ'; return; }
+    items = j.items; draw(); closeDlg(); say('บันทึกแล้ว', true);
+  };
+}
+$('dlgYes').onclick = () => dlgSubmit && dlgSubmit();
+$('dlgNo').onclick = closeDlg;
+document.addEventListener('keydown', e => {
+  if ($('dlg').classList.contains('hide')) return;
+  if (e.key === 'Escape') closeDlg();
+  else if (e.key === 'Enter' && e.target.tagName === 'INPUT' && e.target.type === 'text') $('dlgYes').click();
+});
+
+async function act(action, data){      /* คำสั่งที่ไม่ต้องใช้กล่อง: เลื่อนลำดับ */
+  say(); const j = await api(action, data);
+  if (!j.ok) return say(j.error);
+  items = j.items; draw();
+}
+
+$('add').onclick = () => dlg({
+  title: 'เพิ่มหมวกหลักใหม่', msg: 'ต้องมีตัวรองอย่างน้อย 1 ตัว (เพิ่มตัวอื่นภายหลังได้)', main: true, sub: true, color: true, yes: 'เพิ่ม',
+  run: v => api('pp_save', {main: v.main, sub: v.sub, color: v.color})
+});
+
+$('list').onclick = e => {
+  const b = e.target.closest('button[data-a]'); if (!b || b.disabled) return;
+  const a = b.dataset.a, g = groups[+b.dataset.g], p = items[+b.dataset.i];
+  if (a === 'gup' && g) act('pp_move', {main: g.main, dir: -1});
+  else if (a === 'gdn' && g) act('pp_move', {main: g.main, dir: 1});
+  else if (a === 'up' && p) act('pp_move', {id: p.id, dir: -1});
+  else if (a === 'dn' && p) act('pp_move', {id: p.id, dir: 1});
+  else if (a === 'ren' && g) dlg({
+    title: 'เปลี่ยนชื่อหมวกหลัก', msg: 'ใช้กับทุกตัวรองในหมวกนี้ · รายการที่บันทึกไปแล้วยังนับสถิติถูกต้อง', main: true, mainVal: g.main, yes: 'บันทึก',
+    run: v => v.main.toLowerCase() === g.main.toLowerCase() && v.main === g.main ? Promise.resolve({ok: false, error: 'ชื่อเหมือนเดิม'}) : api('pp_rename', {from: g.main, to: v.main})
+  });
+  else if (a === 'sub' && g) dlg({
+    title: 'เพิ่มตัวรอง', msg: 'หมวก: ' + g.main, sub: true, color: true, yes: 'เพิ่ม',
+    run: v => api('pp_save', {main: g.main, sub: v.sub, color: v.color})
+  });
+  else if (a === 'ed' && p) dlg({
+    title: 'แก้ไขตัวรอง', msg: 'หมวก: ' + p.main, sub: true, color: true, subVal: p.sub, colorVal: p.color, yes: 'บันทึก',
+    run: v => api('pp_save', {id: p.id, main: p.main, sub: v.sub, color: v.color})
+  });
+  else if (a === 'act' && p) {
+    if (p.active) dlg({
+      title: 'ปิดใช้งานตัวรองนี้?', msg: p.main + ' / ' + p.sub + '\nจะไม่แสดงให้เลือกตอนบันทึกใหม่ (รายการเก่าและสถิติยังอยู่ครบ เปิดกลับได้ทุกเมื่อ)',
+      yes: 'ปิดใช้งาน', danger: true, run: () => api('pp_active', {id: p.id, active: false})
+    });
+    else act('pp_active', {id: p.id, active: true});
+  }
+};
+
+view('vLogin');
+</script>
+</body>
+</html>
