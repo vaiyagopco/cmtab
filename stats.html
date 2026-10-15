@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'">
+<meta name="theme-color" content="#0f3d3e">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex,nofollow">
+<title>CMLTS Stats</title>
+<style>
+:root{--bg:#f3f6f5;--card:#fff;--ink:#14282a;--mut:#5d7274;--pri:#0f3d3e;--acc:#e8a317;--line:#d5e0de;--err:#b3261e;--ok:#1b6e3c}
+@media(prefers-color-scheme:dark){:root{--bg:#0d1a1b;--card:#15292a;--ink:#e6f0ee;--mut:#8fa8a6;--pri:#3ba99c;--acc:#f0b73a;--line:#264041;--err:#ff8a80;--ok:#7bd39a}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font:16px/1.5 system-ui,-apple-system,"Noto Sans Thai","Sarabun",sans-serif;background:var(--bg);color:var(--ink);padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+#bar{position:fixed;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,transparent,var(--acc),transparent) no-repeat;background-size:50% 100%;animation:slide 1s linear infinite;opacity:0;transition:opacity .15s;z-index:9;pointer-events:none}
+#bar.on{opacity:1}
+@keyframes slide{from{background-position:-50% 0}to{background-position:150% 0}}
+header{position:sticky;top:0;background:var(--pri);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:8px;z-index:2}
+@media(prefers-color-scheme:dark){header{color:#06201d}}
+header div{flex:1;line-height:1.2}
+header h1{font-size:19px;margin:0}
+header span{font-size:12px;opacity:.85}
+main{padding:12px 16px 40px;max-width:680px;margin:auto}
+.hide{display:none!important}
+input,select,button{font:inherit;color:inherit}
+input,select{width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--card);margin:4px 0 12px}
+input:focus,select:focus,button:focus-visible{outline:3px solid var(--acc);outline-offset:1px}
+label{font-size:14px;color:var(--mut)}
+button{border:0;border-radius:8px;padding:12px 16px;background:var(--pri);color:#fff;font-weight:600;cursor:pointer}
+button:disabled{opacity:.45}
+@media(prefers-color-scheme:dark){button{color:#06201d}}
+header button{background:transparent;color:inherit;border:1px solid currentColor;padding:6px 12px}
+.hint{color:var(--mut);font-size:13px;margin:0 0 10px}
+#msg{color:var(--err);min-height:1.5em;margin:0 0 8px}
+.mrow{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;margin-bottom:12px}
+.mrow select{margin:0}
+.mrow button{padding:10px 14px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.tile b{display:block;font-size:28px;line-height:1.2}
+.tile span{font-size:13px;color:var(--mut)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin:0 0 12px}
+.card h2{font-size:16px;margin:0 0 8px}
+.g{margin:0 0 14px}
+.gt{display:flex;justify-content:space-between;gap:8px;font-weight:600}
+.gt span:last-child{white-space:nowrap}
+.stack{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--bg);margin:4px 0 6px}
+.stack i{display:block;height:100%}
+.sr{display:flex;align-items:center;gap:8px;font-size:14px;padding:1px 0}
+.dot{width:12px;height:12px;border-radius:50%;flex:none}
+.sr .n{flex:1;overflow-wrap:anywhere}
+.sr em{font-style:normal;color:var(--mut);white-space:nowrap}
+.off{opacity:.6}
+.days{display:flex;align-items:flex-end;gap:2px;height:90px;margin-top:6px}
+.days div{flex:1;background:var(--pri);border-radius:2px 2px 0 0;min-height:1px}
+.dl{display:flex;justify-content:space-between;font-size:11px;color:var(--mut);margin-top:2px}
+.tr{display:flex;justify-content:space-between;padding:3px 0;border-top:1px solid var(--line)}
+.tr:first-of-type{border-top:0}
+.empty{color:var(--mut);text-align:center;padding:24px 0}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<header><div><h1>สถิติ Pain Point</h1><span>CMLTS · เฉพาะผู้ดูแล</span></div><button id="out" class="hide">EXIT</button></header>
+<main>
+<p id="msg" role="alert"></p>
+
+<section id="vLogin">
+  <p class="hint">เข้าสู่ระบบด้วยบัญชีผู้ดูแล (admin) เท่านั้น</p>
+  <label for="u">NAME</label><input id="u" autocomplete="username" autocapitalize="none">
+  <label for="p">PIN</label><input id="p" type="password" inputmode="numeric" autocomplete="current-password">
+  <button id="go" style="width:100%">GO</button>
+</section>
+
+<section id="vSt" class="hide">
+  <div class="mrow"><button id="prv" aria-label="เดือนก่อนหน้า">◀</button><select id="mo" aria-label="เลือกเดือน"></select><button id="nxt" aria-label="เดือนถัดไป">▶</button></div>
+  <div id="out2"></div>
+</section>
+</main>
+
+<script>
+if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('framed'); }   // กันถูกฝังในเว็บอื่น (clickjacking)
+const API = 'https://script.google.com/macros/s/AKfycbyBriSISb1kM9tuLvEmXhCNqQn-Dw-ZyEZ-oBOYr8rCmNSfCU0FvdVknxT323EktpoK/exec';
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const HEX = /^#[0-9a-fA-F]{6}$/, col = c => HEX.test(c) ? c : '#8A8F98';
+const TH = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const mName = m => TH[+m.slice(5) - 1] + ' ' + (+m.slice(0, 4) + 543);
+let token = null, me = null, pending = 0, cur = '', mlist = [];
+
+function say(t){ $('msg').textContent = t || ''; }
+function view(v){ $('vLogin').classList.toggle('hide', v !== 'vLogin'); $('vSt').classList.toggle('hide', v !== 'vSt'); $('out').classList.toggle('hide', v === 'vLogin'); }
+async function api(action, data = {}){
+  pending++; $('bar').classList.add('on');
+  try{
+    const r = await fetch(API, {method:'POST', body: JSON.stringify({action, token, ...data})});
+    const j = await r.json();
+    if (j.auth) logout(j.error);
+    return j;
+  }catch(e){ return {ok:false, error:'เชื่อมต่อไม่ได้ ตรวจสอบสัญญาณแล้วลองใหม่'}; }
+  finally{ if (--pending <= 0) { pending = 0; $('bar').classList.remove('on'); } }
+}
+async function busy(b, txt, fn){
+  const old = b.textContent; b.disabled = true; b.textContent = txt;
+  try{ return await fn(); } finally { b.disabled = false; b.textContent = old; }
+}
+function logout(m){ token = null; me = null; $('p').value = ''; $('out2').innerHTML = ''; view('vLogin'); say(m); }
+function bye(t){ if (t) fetch(API, {method:'POST', body: JSON.stringify({action:'logout', token: t})}).catch(() => {}); }
+
+$('go').onclick = () => busy($('go'), 'กำลังเข้าสู่ระบบ…', async () => {
+  say();
+  const j = await api('login', {user: $('u').value, pin: $('p').value});
+  $('p').value = '';
+  if (!j.ok) return say(j.error);
+  if (!j.user || j.user.role !== 'admin') { bye(j.token); token = null; return say('บัญชีนี้ไม่ใช่ผู้ดูแลระบบ'); }
+  token = j.token; me = j.user; view('vSt'); load('');
+});
+$('p').addEventListener('keydown', e => { if (e.key === 'Enter') $('go').click(); });
+$('out').onclick = () => { bye(token); logout(); };
+
+async function load(m){
+  say(); $('out2').innerHTML = '<p class="empty">กำลังโหลด…</p>';
+  const j = await api('stats', m ? {month: m} : {});
+  if (!j.ok) { $('out2').innerHTML = ''; return say(j.error); }
+  cur = j.month;
+  const set = {}; j.months.forEach(x => { set[x.m] = x.n; }); set[cur] = set[cur] || 0;
+  mlist = Object.keys(set).sort().reverse();
+  $('mo').innerHTML = mlist.map(k => `<option value="${esc(k)}"${k === cur ? ' selected' : ''}>${esc(mName(k))} (${set[k]})</option>`).join('');
+  $('nxt').disabled = mlist.indexOf(cur) <= 0; $('prv').disabled = mlist.indexOf(cur) >= mlist.length - 1;
+  draw(j);
+}
+$('mo').onchange = () => load($('mo').value);
+$('prv').onclick = () => { const i = mlist.indexOf(cur); if (i < mlist.length - 1) load(mlist[i + 1]); };
+$('nxt').onclick = () => { const i = mlist.indexOf(cur); if (i > 0) load(mlist[i - 1]); };
+
+function draw(j){
+  if (!j.total) { $('out2').innerHTML = '<p class="empty">เดือนนี้ยังไม่มีรายการ</p>'; return; }
+  const linked = j.groups.reduce((a, g) => a + g.n, 0), old = j.total - linked;
+  const mx = Math.max(1, ...j.days), nd = new Date(+cur.slice(0, 4), +cur.slice(5), 0).getDate();
+  const top = j.groups.length ? j.groups.slice().sort((a, b) => b.n - a.n)[0] : null;
+  let h = `<div class="tiles"><div class="tile"><b>${j.total}</b><span>รายการทั้งหมด</span></div>
+    <div class="tile"><b>${top ? esc(top.main) : '-'}</b><span>หมวกที่พบมากสุด${top ? ' (' + top.n + ')' : ''}</span></div></div>`;
+  h += '<div class="card"><h2>ตามหมวก Pain Point</h2>' + (j.groups.length ? j.groups.map(g => `<div class="g">
+    <div class="gt"><span>${esc(g.main)}</span><span>${g.n} · ${Math.round(g.n * 100 / j.total)}%</span></div>
+    <div class="stack" role="img" aria-label="${esc(g.main)} ${g.n} รายการ">${g.subs.map(s => `<i style="width:${s.n * 100 / g.n}%;background:${col(s.color)}"></i>`).join('')}</div>
+    ${g.subs.map(s => `<div class="sr ${s.active ? '' : 'off'}"><span class="dot" style="background:${col(s.color)}"></span><span class="n">${esc(s.sub)}${s.active ? '' : ' (ปิดใช้งาน)'}</span><em>${s.n}</em></div>`).join('')}
+  </div>`).join('') : '<p class="hint">ยังไม่มีรายการที่ผูกหมวก</p>') + '</div>';
+  if (old) h += `<div class="card"><h2>ข้อมูลเก่า (ยังไม่ผูกหมวก) · ${old}</h2>${j.legacy.map(l => `<div class="tr"><span>${esc(l.text)}</span><b>${l.n}</b></div>`).join('')}</div>`;
+  h += `<div class="card"><h2>รายวัน</h2><div class="days" role="img" aria-label="จำนวนรายการรายวัน">${j.days.slice(0, nd).map((n, i) => `<div title="วันที่ ${i + 1}: ${n}" style="height:${n * 100 / mx}%"></div>`).join('')}</div>
+    <div class="dl"><span>1</span><span>${nd}</span></div></div>`;
+  h += '<div class="card"><h2>ตามช่าง</h2>' + j.tech.map(t => `<div class="tr"><span>${esc(t.name)}</span><b>${t.n}</b></div>`).join('') + '</div>';
+  $('out2').innerHTML = h;
+}
+view('vLogin');
+</script>
+</body>
+</html>
