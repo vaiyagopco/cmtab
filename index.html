@@ -50,6 +50,7 @@ main{padding:14px 14px 100px;max-width:640px;margin:auto}
 input,textarea,select,button{font:inherit;color:inherit}
 input,textarea,select{width:100%;padding:12px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);margin:4px 0 14px}
 input:disabled,textarea:disabled,select:disabled{opacity:.55}
+input[readonly]{background:var(--soft)}
 input:focus,textarea:focus,select:focus,button:focus-visible,a:focus-visible{outline:3px solid var(--g);outline-offset:1px;border-color:var(--gd)}
 label{display:block;font-size:13px;font-weight:600;color:var(--mut)}
 label i{color:var(--o);font-style:normal;font-size:16px}
@@ -60,6 +61,7 @@ button.ghost{background:transparent;color:var(--gd);border:1.5px solid var(--gd)
 button.del{background:transparent;color:var(--err);border:1.5px solid var(--err)}
 button.big{width:100%;font-size:18px;padding:15px}
 .hint{color:var(--mut);min-height:1.5em;margin:4px 0 12px;font-size:14px}
+.hint:empty{display:none}
 .hint.bad{color:var(--err);font-weight:600}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
@@ -102,12 +104,15 @@ button.big{width:100%;font-size:18px;padding:15px}
 .lbar span{flex:1;color:var(--mut);font-size:13px;font-weight:600}
 .lbar button{padding:6px 12px;font-size:13px;border-radius:10px}
 .dh{margin:12px 2px 4px;color:var(--gd);font-size:12px;font-weight:700;letter-spacing:.4px}
-.item{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--g);border-radius:12px;margin:6px 0;overflow:hidden}
-.item.open{border-left-color:var(--o);box-shadow:0 4px 14px #0000001a}
+/* แถบสีด้านซ้าย = สีของ Pain Point (ตั้งโดย Admin ในแท็บ PainPoints) ผ่านตัวแปร --pc */
+.item{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--pc,#8A8F98);border-radius:12px;margin:6px 0;overflow:hidden}
+.item.open{box-shadow:0 4px 14px #0000001f;outline:2px solid var(--line)}
 .head{display:flex;align-items:center;gap:8px;padding:8px 8px 8px 12px;cursor:pointer}
 .hl{flex:1;min-width:0}
 .l1{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px}
 .l1 b{font-size:21px;line-height:1.25;letter-spacing:.4px;font-variant-numeric:tabular-nums}
+.pn{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:600;line-height:1.3;margin:1px 0 2px;overflow-wrap:anywhere}
+.dot{width:11px;height:11px;border-radius:50%;background:var(--pc,#8A8F98);flex:none;display:inline-block}
 .dt{display:block;color:var(--mut);font-size:12px;line-height:1.3;overflow-wrap:anywhere}
 .chev{width:36px;height:36px;padding:0;border-radius:50%;background:var(--soft);color:var(--gd);flex:none}
 .chev .ic{transition:transform .15s}
@@ -133,11 +138,18 @@ a.btn.go{display:flex;align-items:center;justify-content:center;gap:8px;text-dec
 .fmode:empty{display:none}
 .fs{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 14px 2px;margin:0 0 12px}
 .fs h3{margin:0 0 8px;font-size:12px;letter-spacing:.8px;color:var(--gd);text-transform:uppercase;display:flex;align-items:center;gap:6px}
-#net{font-size:24px;font-weight:800;letter-spacing:1px;padding:14px;border-color:var(--gd);font-variant-numeric:tabular-nums}
+.fs .big{margin:0 0 12px}
+#net0{font-size:26px;font-weight:800;letter-spacing:1.5px;padding:14px;border-color:var(--gd);font-variant-numeric:tabular-nums}
+#net{font-size:20px;font-weight:800;letter-spacing:1px;font-variant-numeric:tabular-nums}
+.selrow{display:flex;align-items:center;gap:10px}
+.selrow select{flex:1;min-width:0}
+.selrow .dot{width:16px;height:16px;margin-bottom:10px}
+#chgNet{width:100%;margin:-6px 0 12px;padding:10px}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:-6px 0 14px}
 .chips:empty{display:none}
 .chips button{padding:7px 12px;font-size:14px;font-weight:600;border-radius:18px;background:var(--soft);color:var(--ink);border:1.5px solid transparent}
 .chips button.on{background:var(--g);color:var(--on-g);border-color:var(--gd)}
+#lineDel{width:100%;margin:-4px 0 12px;padding:10px}
 #gps{width:100%;margin:-6px 0 14px}
 .actions{position:sticky;bottom:0;z-index:5;display:grid;grid-template-columns:1fr 2fr;gap:10px;padding:14px 0 calc(8px + env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--bg) 28%)}
 .actions button{font-size:17px;padding:15px}
@@ -209,7 +221,7 @@ a.btn.go{display:flex;align-items:center;justify-content:center;gap:8px;text-dec
 <section id="vHome" class="hide">
   <div class="who" id="who"><div class="av"><svg class="ic"><use href="#i-user"/></svg></div><div><b id="whoName"></b><span class="tag g" id="whoRole"></span></div></div>
   <div class="tools">
-    <button class="tool feat" id="toolList"><span class="tile"><svg class="ic"><use href="#i-list"/></svg></span><span><b>CMList</b><small>v1 · บันทึก / ค้นหา / แก้ไขงานซ่อม</small></span><span class="go">เปิด<svg class="ic"><use href="#i-arrow"/></svg></span></button>
+    <button class="tool feat" id="toolList"><span class="tile"><svg class="ic"><use href="#i-list"/></svg></span><span><b>CMList</b><small>v2 · บันทึก / ค้นหา / แก้ไขงานซ่อม</small></span><span class="go">เปิด<svg class="ic"><use href="#i-arrow"/></svg></span></button>
     <button class="tool sec" id="toolBar"><span class="tile"><svg class="ic"><use href="#i-bar"/></svg></span><span><b>Barcode</b><small>GenBC</small></span></button>
     <a class="tool sec" id="toolSp" href="https://cmltoolbymm.netlify.app/" target="_blank" rel="noopener noreferrer"><span class="tile o"><svg class="ic"><use href="#i-tree"/></svg></span><span><b>Splitter Tree</b><small>SPFDV1</small></span></a>
   </div>
@@ -227,42 +239,71 @@ a.btn.go{display:flex;align-items:center;justify-content:center;gap:8px;text-dec
 
 <section id="vList" class="hide">
   <div class="sticky">
-    <label class="search"><svg class="ic"><use href="#i-search"/></svg><input id="q" type="search" placeholder="ค้นหา Internet No. / Phone / Drum / SP / Pain point" aria-label="ค้นหา"></label>
+    <label class="search"><svg class="ic"><use href="#i-search"/></svg><input id="q" type="search" placeholder="ค้นหา Internet No. (เลขเต็ม/4 ตัวท้าย) / Phone / Drum / SP / Pain point" aria-label="ค้นหา"></label>
     <div class="lbar"><span id="lcap"></span><button id="hist" type="button" class="ghost"></button></div>
   </div>
   <div id="items"></div>
   <button id="add" class="fab"><svg class="ic"><use href="#i-plus"/></svg>เพิ่มข้อมูล</button>
 </section>
 
+<!-- ขั้นที่ 1: กรอก Internet No. แล้วกด "เริ่ม" -->
+<section id="vStart" class="hide">
+  <p class="fmode">เพิ่มรายการใหม่ · ขั้นที่ 1 จาก 2</p>
+  <div class="fs">
+    <h3><svg class="ic"><use href="#i-user"/></svg>Internet No.</h3>
+    <label for="net0">Internet No. <i>*</i> (10 หลัก ขึ้นต้น 888 หรือ 880)</label>
+    <input id="net0" inputmode="numeric" maxlength="10" autocomplete="off">
+    <p class="hint" id="net0Hint"></p>
+  </div>
+  <div class="actions"><button id="startNo" class="ghost"><svg class="ic"><use href="#i-x"/></svg>ยกเลิก</button><button id="start">เริ่ม<svg class="ic"><use href="#i-arrow"/></svg></button></div>
+</section>
+
+<!-- ขั้นที่ 2: กรอกข้อมูล (บังคับเฉพาะ Pain Point) -->
 <section id="vForm" class="hide">
   <p class="fmode" id="fmode"></p>
   <input type="hidden" id="id">
   <div class="fs">
-    <h3><svg class="ic"><use href="#i-user"/></svg>ลูกค้า</h3>
-    <label for="net">Internet No. <i>*</i> (888 หรือ 880)</label>
-    <input id="net" inputmode="numeric" maxlength="30" autocomplete="off">
-    <label for="tel">Phone No.</label>
-    <input id="tel" type="tel" inputmode="tel" maxlength="20" autocomplete="off">
+    <h3><svg class="ic"><use href="#i-user"/></svg>Internet No.</h3>
+    <input id="net" inputmode="numeric" maxlength="10" autocomplete="off" aria-label="Internet No.">
+    <button id="chgNet" type="button" class="ghost hide">เปลี่ยนเลข Internet No.</button>
   </div>
   <div class="fs">
-    <h3><svg class="ic"><use href="#i-pin"/></svg>ตำแหน่ง</h3>
-    <label for="pin">Home Pin (จับพิกัดหรือวางlat,lng)</label>
+    <h3><svg class="ic"><use href="#i-list"/></svg>Pain Point</h3>
+    <label for="ppMain">หมวกหลัก <i>*</i></label>
+    <select id="ppMain"></select>
+    <label for="ppSub">ตัวรอง <i>*</i></label>
+    <div class="selrow"><i class="dot" id="ppDot"></i><select id="ppSub" disabled></select></div>
+    <p class="hint" id="ppOld"></p>
+    <p class="hint bad" id="ppMsg"></p>
+  </div>
+  <div class="fs">
+    <h3><svg class="ic"><use href="#i-ext"/></svg>Line Type</h3>
+    <button id="lineAdd" type="button" class="ghost big"><svg class="ic"><use href="#i-plus"/></svg>เพิ่ม Line Type (วัดระยะสาย)</button>
+    <div id="lineBox" class="hide">
+      <label for="drum">Drum No. (Line Type)</label>
+      <input id="drum" maxlength="60" autocomplete="off">
+      <div class="chips" id="drumChips"></div>
+      <button id="lineDel" type="button" class="del"><svg class="ic"><use href="#i-trash"/></svg>ลบ Line Type</button>
+    </div>
+  </div>
+  <div class="fs">
+    <h3><svg class="ic"><use href="#i-pin"/></svg>Place</h3>
+    <label for="pin">Home Pin (จับพิกัดหรือวาง lat,lng)</label>
     <input id="pin" inputmode="text" placeholder="13.756331,100.501762" autocomplete="off">
     <button id="gps" type="button" class="ghost"><svg class="ic"><use href="#i-gps"/></svg>พิกัดปัจจุบัน</button>
   </div>
   <div class="fs">
-    <h3><svg class="ic"><use href="#i-list"/></svg>งานซ่อม</h3>
-    <label for="pain">Pain point </label>
-    <input id="pain" maxlength="100" autocomplete="off">
-    <div class="chips" id="chips"></div>
-    <label for="drum">Drum No. (Line Type)</label>
-    <input id="drum" maxlength="60" autocomplete="off">
-    <div class="chips" id="drumChips"></div>
+    <h3><svg class="ic"><use href="#i-tree"/></svg>SP &amp; Detail</h3>
     <label for="sp">SP Code (Splitter Alias)</label><input id="sp" maxlength="60" autocomplete="off">
+    <label for="note">Detail (หมายเหตุ)</label>
+    <textarea id="note" rows="6" maxlength="2000"></textarea>
+  </div>
+  <div class="fs">
+    <h3><svg class="ic"><use href="#i-user"/></svg>ข้อมูลเพิ่มเติม (ไม่บังคับ)</h3>
+    <label for="tel">Phone No.</label>
+    <input id="tel" type="tel" inputmode="tel" maxlength="20" autocomplete="off">
     <label for="plate">Name Plate</label>
     <select id="plate"><option value="">ไม่ระบุ</option><option value="มี">มี</option><option value="ไม่มี">ไม่มี</option></select>
-    <label for="note">Drop Details (หมายเหตุ)</label>
-    <textarea id="note" rows="8" maxlength="2000"></textarea>
   </div>
   <div class="actions"><button id="cancel" class="ghost"><svg class="ic"><use href="#i-x"/></svg>ยกเลิก</button><button id="save"><svg class="ic"><use href="#i-check"/></svg>บันทึก</button></div>
 </section>
@@ -274,8 +315,8 @@ a.btn.go{display:flex;align-items:center;justify-content:center;gap:8px;text-dec
 <script>
 if (window.top !== window.self) { document.documentElement.textContent = ''; throw new Error('framed'); }   // กันถูกฝังในเว็บอื่น (clickjacking)
 const API = 'https://script.google.com/macros/s/AKfycbyBriSISb1kM9tuLvEmXhCNqQn-Dw-ZyEZ-oBOYr8rCmNSfCU0FvdVknxT323EktpoK/exec';
-const PAINS = ['ออนไลน์ปกติ','สายขาด','สายหัก/งอ','อุปกรณ์เสีย','งานติดตั้งใหม่(NEW)','เน็ตช้า/หลุดบ่อย','IPCAM(Cloud)','อื่นๆ'];
 const DRUMS = ['ZT cable','Shenzhen','Hulli cable','Fiberhome','FIBRE3','Change','Chang Yun','AWN'];
+const GRAY = '#8A8F98';
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 /* แสดงเฉพาะวันที่ yyyy-mm-dd */
@@ -326,9 +367,10 @@ function pngBlob(text, cb){
 
 let token = sessionStorage.getItem('t'), me = JSON.parse(sessionStorage.getItem('u') || 'null');
 let rows = [], allRows = null, found = [], hist = false, seq = 0, timer, pending = 0, formSeq = 0, loaded = false, keepSn = '';
+let PP = [], PPMAP = {}, ppAt = 0, ppBusy = null, legacy = '', fromForm = false;
 const SLOW = 'กำลังเชื่อมต่อ… ครั้งแรกอาจใช้เวลาสักครู่';
 
-const VIEWS = ['vLogin','vHome','vBar','vList','vForm'];
+const VIEWS = ['vLogin','vHome','vBar','vList','vStart','vForm'];
 function view(v){
   VIEWS.forEach(x => $(x).classList.toggle('hide', x !== v));
   $('out').classList.toggle('hide', v === 'vLogin');
@@ -366,8 +408,29 @@ async function busy(b, txt, fn){
 
 function logout(m){
   token = null; me = null; rows = []; allRows = null; found = []; hist = false; loaded = false; sessionStorage.clear();
+  PP = []; PPMAP = {}; ppAt = 0; legacy = ''; fromForm = false;
   $('p').value = ''; $('q').value = ''; $('bt').value = ''; $('items').innerHTML = '';
   closeBig(); view('vLogin'); say(m);
+}
+
+/* ---------- Pain Point: ดึงรายการ (เฉพาะที่เปิดใช้งาน) จากเซิร์ฟเวอร์ แล้วเก็บไว้ 5 นาที ---------- */
+function ppColor(id){
+  const p = id ? PPMAP[id] : null;
+  return p && /^#[0-9a-fA-F]{6}$/.test(p.color) ? p.color : GRAY;      // ตรวจรูปแบบสีซ้ำฝั่งหน้าเว็บ
+}
+function loadPP(force){
+  if (!token) return Promise.resolve();
+  if (!force && PP.length && Date.now() - ppAt < 300000) return Promise.resolve();
+  if (ppBusy) return ppBusy;
+  ppBusy = api('painpoints').then(j => {
+    if (j && j.ok && Array.isArray(j.items)) {
+      PP = j.items.filter(p => p && typeof p.id === 'string')
+        .map(p => ({id: String(p.id), main: String(p.main || ''), sub: String(p.sub || ''), color: String(p.color || '')}));
+      PPMAP = {}; PP.forEach(p => { PPMAP[p.id] = p; });
+      ppAt = Date.now();
+    }
+  }).finally(() => { ppBusy = null; });
+  return ppBusy;
 }
 
 $('go').onclick = () => busy($('go'), 'กำลังเข้าสู่ระบบ…', async () => {
@@ -377,14 +440,18 @@ $('go').onclick = () => busy($('go'), 'กำลังเข้าสู่ร�
   if (!j.ok) return say(j.error);
   token = j.token; me = j.user; rows = j.rows || []; loaded = true;
   sessionStorage.setItem('t', token); sessionStorage.setItem('u', JSON.stringify(me));
-  goHome();
+  goHome(); loadPP(true);
 });
+$('p').addEventListener('keydown', e => { if (e.key === 'Enter') $('go').click(); });
 function bye(){ if (token) fetch(API, {method:'POST', body: JSON.stringify({action:'logout', token})}).catch(() => {}); }   // ยกเลิกเซสชันฝั่งเซิร์ฟเวอร์ด้วย
 $('out').onclick = () => { bye(); logout(); };
 $('home').onclick = () => goHome();
 
 /* ---------- หน้าแรก: เครื่องมือ ---------- */
-$('toolList').onclick = () => { if (loaded) { view('vList'); draw(); load(true); } else load(); };
+$('toolList').onclick = () => {
+  if (loaded) { view('vList'); draw(); load(true); } else load();
+  loadPP().then(() => { if (!$('vList').classList.contains('hide')) draw(); });
+};
 $('toolBar').onclick = () => { say(); view('vBar'); updBar(); $('bt').focus(); };
 
 /* ---------- เครื่องมือ Barcode ---------- */
@@ -465,14 +532,14 @@ function shown(){
 
 const ic = (n, c) => `<svg class="ic${c ? ' ' + c : ''}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
 function itemHtml(r){
-  const m = mapLink(r.pin), d0 = fd(r.at);
+  const m = mapLink(r.pin), d0 = fd(r.at), pc = ppColor(r.pid);
   const d1 = r.upAt ? 'แก้ไข: ' + ts(r.upAt, d0) + ' · ' + (r.upBy || '-')
     : 'บันทึก: ' + String(r.at || '').slice(11, 16) + ' · ' + (r.by || '-');
   const canDel = me && (me.role === 'admin' || r.by === me.name);
   const kv = (k, v) => `<div><dt>${k}</dt><dd>${esc(v) || '-'}</dd></div>`;
-  return `<div class="item" data-id="${esc(r.id)}">
+  return `<div class="item" data-id="${esc(r.id)}" style="--pc:${pc}">
       <div class="head" data-a="tog">
-        <div class="hl"><div class="l1"><b>${esc(r.net)}</b>${r.pain ? `<span class="tag">${esc(r.pain)}</span>` : ''}</div><span class="dt">${esc(d1)}</span></div>
+        <div class="hl"><div class="l1"><b>${esc(r.net)}</b></div>${r.pain ? `<span class="pn"><i class="dot"></i>${esc(r.pain)}</span>` : ''}<span class="dt">${esc(d1)}</span></div>
         <button type="button" class="chev" data-a="tog" aria-expanded="false" aria-label="รายละเอียด">${ic('chev')}</button>
       </div>
       <div class="detail">
@@ -511,15 +578,72 @@ function toggle(el){
   if (on) { setOpen(el, true); el.scrollIntoView({block:'nearest'}); }
 }
 
-const F = ['net','tel','pin','pain','drum','sp','plate','note'];
-function lock(on){ F.forEach(k => $(k).disabled = on); $('save').disabled = on; $('gps').disabled = on; }
-/* keepSn: เก็บค่า SN เดิมของรายการ (ถ้าเคยบันทึกไว้) เพื่อไม่ให้หายตอนแก้ไข — ไม่แสดงในฟอร์ม */
-function fill(r){ F.forEach(k => $(k).value = r[k] ?? ''); keepSn = r.sn || ''; sync('chips', 'pain'); sync('drumChips', 'drum'); }
+/* ---------- ฟอร์ม ---------- */
+const F = ['net','tel','pin','drum','sp','plate','note'];
+function lock(on){
+  F.forEach(k => $(k).disabled = on);
+  $('ppMain').disabled = on; $('ppSub').disabled = on || !$('ppMain').value;
+  $('lineAdd').disabled = on; $('lineDel').disabled = on; $('chgNet').disabled = on;
+  $('save').disabled = on; $('gps').disabled = on;
+}
 
-function openForm(r, mode){
-  say(); formSeq++; $('id').value = r ? r.id : ''; $('fmode').textContent = mode || (r ? 'แก้ไขรายการเดิม' : 'เพิ่มรายการใหม่');
-  fill(r || {}); lock(false); view('vForm'); window.scrollTo(0, 0);
-  if (!r) $('net').focus();
+/* Pain Point: หมวกหลัก → ตัวรอง */
+function fillMain(){
+  const sel = $('ppMain'), seen = [];
+  sel.length = 0; sel.add(new Option('— เลือกหมวกหลัก —', ''));
+  PP.forEach(p => { if (seen.indexOf(p.main) < 0) { seen.push(p.main); sel.add(new Option(p.main, p.main)); } });
+}
+function fillSub(main){
+  const sel = $('ppSub');
+  sel.length = 0; sel.add(new Option(main ? '— เลือกตัวรอง —' : 'เลือกหมวกหลักก่อน', ''));
+  if (main) PP.filter(p => p.main === main).forEach(p => sel.add(new Option(p.sub, p.id)));
+  sel.disabled = !main;
+}
+function updPain(){
+  const id = $('ppSub').value;
+  $('ppDot').style.background = id ? ppColor(id) : GRAY;
+  $('ppOld').textContent = (!id && legacy) ? 'Pain point เดิม: ' + legacy + ' (เลือกใหม่จากรายการเพื่อเปลี่ยน)' : '';
+  $('ppMsg').textContent = (!PP.length && !ppBusy) ? 'ยังไม่มีรายการ Pain Point (โหลดไม่สำเร็จ) กลับไปหน้ารายการแล้วลองเพิ่มใหม่' : '';
+}
+function setPain(r){
+  const p = r.painId ? PPMAP[r.painId] : null;
+  legacy = '';
+  fillMain();
+  if (p) { $('ppMain').value = p.main; fillSub(p.main); $('ppSub').value = p.id; }
+  else { fillSub(''); if (r.pain) legacy = String(r.pain); }
+  updPain();
+}
+function refreshPP(){          // โหลดรายการเสร็จทีหลัง: ใส่ตัวเลือกใหม่ แต่คงที่เลือกไว้เดิม
+  const m = $('ppMain').value, s = $('ppSub').value;
+  fillMain(); $('ppMain').value = m; fillSub($('ppMain').value); $('ppSub').value = s; updPain();
+}
+$('ppMain').onchange = () => { fillSub($('ppMain').value); updPain(); };
+$('ppSub').onchange = updPain;
+
+/* Line Type: ปุ่มเพิ่ม → แสดงช่อง Drum No. (เก็บรูปแบบเดิม) */
+function setLine(on){ $('lineBox').classList.toggle('hide', !on); $('lineAdd').classList.toggle('hide', on); }
+$('lineAdd').onclick = () => { setLine(true); $('drum').focus(); };
+$('lineDel').onclick = () => { $('drum').value = ''; sync('drumChips', 'drum'); setLine(false); };
+
+/* keepSn: เก็บค่า SN เดิมของรายการ (ถ้าเคยบันทึกไว้) เพื่อไม่ให้หายตอนแก้ไข — ไม่แสดงในฟอร์ม */
+function fill(r){
+  F.forEach(k => $(k).value = r[k] ?? '');
+  keepSn = r.sn || '';
+  setPain(r); setLine(!!r.drum); sync('drumChips', 'drum');
+}
+
+/* mode: 'new' (มาจากขั้นที่ 1) | 'again' (คัดลอกลูกค้าจากรายการเดิม) | 'edit' (แก้ไขรายการเดิม) */
+function openForm(mode, id){
+  const p = loadPP();
+  say(); formSeq++; $('id').value = id || '';
+  $('fmode').textContent = mode === 'edit' ? 'แก้ไขรายการเดิม'
+    : mode === 'again' ? 'เพิ่มรายการใหม่ของวันนี้ · ขั้นที่ 2 จาก 2 (คัดข้อมูลลูกค้าจากรายการเดิม ไม่ทับรายการเดิม)'
+    : 'เพิ่มรายการใหม่ · ขั้นที่ 2 จาก 2';
+  const isNew = mode !== 'edit';
+  $('net').readOnly = isNew; $('net').maxLength = isNew ? 10 : 30;
+  $('chgNet').classList.toggle('hide', !isNew);
+  fill({}); lock(false); view('vForm'); window.scrollTo(0, 0);
+  if (isNew) p.then(refreshPP);
 }
 
 $('items').onclick = async e => {
@@ -527,22 +651,22 @@ $('items').onclick = async e => {
   const el = b.closest('.item'), id = el.dataset.id, r = rows.find(x => x.id === id); if (!r) return;
   if (b.dataset.a === 'tog') return toggle(el);
   if (b.dataset.a === 'edit') {
-    openForm(null, 'แก้ไขรายการเดิม'); const my = formSeq;
-    $('id').value = id; lock(true); say('กำลังโหลดข้อมูล…');
-    const j = await api('get', {id});
+    openForm('edit', id); const my = formSeq;
+    lock(true); say('กำลังโหลดข้อมูล…');
+    const [j] = await Promise.all([api('get', {id}), loadPP()]);
     if (my !== formSeq) return;
     if (!j.ok) { view('vList'); return say(j.error); }
     fill(j.rec); lock(false); say();
     return;
   }
   if (b.dataset.a === 'again') {
-    openForm(null, 'เพิ่มรายการใหม่ของวันนี้ (คัดข้อมูลลูกค้าจากรายการเดิม ไม่ทับรายการเดิม)'); const my = formSeq;
+    openForm('again'); const my = formSeq;
     lock(true); say('กำลังโหลดข้อมูล…');
-    const j = await api('get', {id});
+    const [j] = await Promise.all([api('get', {id}), loadPP()]);
     if (my !== formSeq) return;
     if (!j.ok) { view('vList'); return say(j.error); }
     const c = j.rec; fill({net: c.net, tel: c.tel, pin: c.pin, drum: c.drum, sp: c.sp, plate: c.plate}); lock(false); say();
-    $('pain').focus();
+    $('ppMain').focus();
     return;
   }
   if (b.dataset.a === 'del') {
@@ -555,17 +679,36 @@ $('items').onclick = async e => {
   }
 };
 
-/* ปุ่มจิ้มเลือก: Pain point และ Drum No. */
+/* ปุ่มจิ้มเลือก: Drum No. */
 function chips(box, list){ $(box).innerHTML = list.map(p => `<button type="button">${esc(p)}</button>`).join(''); }
 function sync(box, input){ [...$(box).children].forEach(b => b.classList.toggle('on', b.textContent === $(input).value.trim())); }
 function wire(box, input){
   $(box).onclick = e => { const b = e.target.closest('button'); if (b) { $(input).value = b.textContent; sync(box, input); } };
   $(input).addEventListener('input', () => sync(box, input));
 }
-chips('chips', PAINS); wire('chips', 'pain');
 chips('drumChips', DRUMS); wire('drumChips', 'drum');
 
-$('add').onclick = () => openForm();
+/* ---------- ขั้นที่ 1: Internet No. → เริ่ม ---------- */
+function startGo(){
+  const n = $('net0').value.trim();
+  if (!/^(888|880)\d{7}$/.test(n)) return say('Internet No. ต้องเป็นตัวเลข 10 หลัก ขึ้นต้นด้วย 888 หรือ 880');
+  say();
+  if (fromForm) { $('net').value = n; fromForm = false; view('vForm'); return; }     // เปลี่ยนเลขระหว่างกรอก: คงข้อมูลที่กรอกไว้
+  openForm('new'); $('net').value = n; $('ppMain').focus();
+}
+$('add').onclick = () => { say(); fromForm = false; $('net0').value = ''; $('net0Hint').textContent = ''; view('vStart'); $('net0').focus(); };
+$('start').onclick = startGo;
+$('net0').addEventListener('keydown', e => { if (e.key === 'Enter') startGo(); });
+$('net0').oninput = () => {
+  const v = $('net0').value.replace(/\D/g, '').slice(0, 10);
+  if (v !== $('net0').value) $('net0').value = v;
+  $('net0Hint').textContent = v ? 'กรอกแล้ว ' + v.length + '/10 หลัก' : '';
+};
+$('startNo').onclick = () => { say(); if (fromForm) { fromForm = false; view('vForm'); } else view('vList'); };
+$('chgNet').onclick = () => {
+  fromForm = true; say(); $('net0').value = String($('net').value).replace(/\D/g, '').slice(0, 10); $('net0').oninput();
+  view('vStart'); $('net0').focus();
+};
 $('cancel').onclick = () => { formSeq++; say(); view('vList'); };
 
 $('gps').onclick = () => {
@@ -591,12 +734,16 @@ $('save').onclick = () => busy($('save'), 'กำลังบันทึก…'
   say();
   const rec = {id: $('id').value, sn: keepSn}; F.forEach(k => rec[k] = $(k).value.trim());
   if (!(rec.id ? /^(888|880)\d+$/ : /^(888|880)\d{7}$/).test(rec.net)) return say('Internet No. ต้องเป็นตัวเลข 10 หลัก ขึ้นต้นด้วย 888 หรือ 880');
+  const sub = $('ppSub').value;
+  if (sub) rec.painId = sub;                       // เลือกจากรายการ: เซิร์ฟเวอร์ตรวจและสร้างข้อความ Pain Point เอง
+  else if (legacy) rec.pain = legacy;              // รายการเก่า (ข้อความอิสระ / ตัวเลือกที่ถูกปิดแล้ว) แก้ช่องอื่นได้โดยคงค่าเดิม
+  else return say('เลือก Pain Point (หมวกหลักและตัวรอง) ก่อนบันทึก');
   const j = await api('save', {rec});
   if (!j.ok) return say(j.error);
   upsert(j.item); formSeq++; view('vList'); draw(); window.scrollTo(0, 0);
 });
 
-if (token && me) { goHome(); ping(); } else { view('vLogin'); ping(); }
+if (token && me) { goHome(); ping(); loadPP(); } else { view('vLogin'); ping(); }
 </script>
 </body>
 </html>
