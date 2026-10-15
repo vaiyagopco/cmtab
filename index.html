@@ -590,7 +590,7 @@ function upsert(item){
 $('save').onclick = () => busy($('save'), 'กำลังบันทึก…', async () => {
   say();
   const rec = {id: $('id').value, sn: keepSn}; F.forEach(k => rec[k] = $(k).value.trim());
-  if (!/^(888|880)\d+$/.test(  if (!(rec.id ? /^(888|880)\d+$/ : /^(888|880)\d{7}$/).test(rec.net)) return say('Internet No. ต้องเป็นตัวเลข 10 หลัก ขึ้นต้นด้วย 888 หรือ 880');)) return say('Internet No. ต้องเป็นตัวเลขและขึ้นต้นด้วย 888 หรือ 880');
+  if (!(rec.id ? /^(888|880)\d+$/ : /^(888|880)\d{7}$/).test(rec.net)) return say('Internet No. ต้องเป็นตัวเลข 10 หลัก ขึ้นต้นด้วย 888 หรือ 880');
   const j = await api('save', {rec});
   if (!j.ok) return say(j.error);
   upsert(j.item); formSeq++; view('vList'); draw(); window.scrollTo(0, 0);
