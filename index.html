@@ -172,6 +172,19 @@ a.btn.go{display:flex;align-items:center;justify-content:center;gap:8px;text-dec
 #dlg b{font-size:19px;color:var(--err);display:flex;align-items:center;gap:8px}
 #dlg p{margin:10px 0 18px;overflow-wrap:anywhere;white-space:pre-line}
 #dlg button.del.solid{background:var(--err);color:#fff;border-color:var(--err)}
+
+/* ---------- SP Finder (ระบบ 2): หน้าต่างหลังบันทึก ---------- */
+#spd{position:fixed;inset:0;z-index:72;background:#000a;display:flex;align-items:flex-end;justify-content:center;padding:12px}
+@media(min-width:560px){#spd{align-items:center}}
+#spd .box{background:var(--card);color:var(--ink);border-radius:18px;padding:18px 16px 14px;width:100%;max-width:440px;max-height:88vh;overflow:auto;box-shadow:0 10px 36px #0009}
+#spd .st{display:flex;align-items:center;gap:8px;font-size:18px;font-weight:800;margin:0 0 6px}
+#spd .st.ok{color:var(--gd)} #spd .st.warn{color:var(--o)} #spd .st.bad{color:var(--err)}
+#spd .alias{font:800 19px/1.3 ui-monospace,Menlo,Consolas,monospace;overflow-wrap:anywhere;margin:2px 0 8px}
+#spd .kv{grid-template-columns:1fr 1fr;margin:6px 0 12px}
+#spd .kv .w{grid-column:1/-1}
+#spd .pend{background:var(--soft);border-radius:10px;padding:8px 10px;font-size:13px;margin:0 0 12px;color:var(--mut)}
+#spd .two{margin-top:4px}
+#spd .src{font-size:12px;color:var(--mut);margin:0 0 10px}
 </style>
 </head>
 <body>
@@ -310,6 +323,7 @@ a.btn.go{display:flex;align-items:center;justify-content:center;gap:8px;text-dec
 </main>
 
 <div id="dlg" class="hide" role="dialog" aria-modal="true" aria-labelledby="dlgT"><div class="box"><b id="dlgT"><svg class="ic"><use href="#i-warn"/></svg>ยืนยันการลบ</b><p id="dlgM"></p><div class="two"><button id="dlgNo" class="ghost">ยกเลิก</button><button id="dlgYes" class="del solid">ลบถาวร</button></div></div></div>
+<div id="spd" class="hide" role="dialog" aria-modal="true" aria-label="SP Finder"><div class="box" id="spdBox"></div></div>
 <div id="big" class="hide"><div id="bigBox"></div></div>
 
 <script>
@@ -741,7 +755,106 @@ $('save').onclick = () => busy($('save'), 'กำลังบันทึก…'
   const j = await api('save', {rec});
   if (!j.ok) return say(j.error);
   upsert(j.item); formSeq++; view('vList'); draw(); window.scrollTo(0, 0);
+  if (rec.sp) spFlow(rec.sp, j.item);              // ระบบ 2: ตรวจ SP กับ SP Finder (ไม่กระทบการบันทึก)
 });
+
+/* ================= SP Finder (ระบบ 2) — ตรวจช่อง SP หลังบันทึก =================
+   ใช่ SP ตัวเดิม → ส่งอัปเดต Lat,Long · ไม่มีในระบบ → เพิ่ม SP · SP Code ไม่ตรง → แก้ใน CMtap / ส่งคำขอ
+   ทุกคำขอเข้า SP Finder แบบ "รอ Admin อนุมัติ" — การบันทึกงานซ่อมสำเร็จไปก่อนแล้วเสมอ */
+const SP_RATIOS = ['1:8','1:4','1:16','1:32'];
+function spClose(){ $('spd').classList.add('hide'); $('spdBox').innerHTML = ''; }
+function spLL(s){
+  const m = String(s || '').trim().match(/^(-?\d{1,3}(?:\.\d+)?)\s*[, ]\s*(-?\d{1,3}(?:\.\d+)?)$/);
+  if (!m) return 'กรอกเป็น Lat,Long เช่น 16.202701,103.898637';
+  const a = +m[1], b = +m[2];
+  if (a >= 102.5 && a <= 105.5 && b >= 14.5 && b <= 17.5) return 'Lat กับ Long สลับกัน — Lat ต้องขึ้นต้นด้วย 14-17';
+  if (!(a >= 14.5 && a <= 17.5 && b >= 102.5 && b <= 105.5)) return 'พิกัดอยู่นอกพื้นที่ (Lat 14.5-17.5, Long 102.5-105.5)';
+  return '';
+}
+function spInfo(sp){
+  return `<dl class="kv">
+    <div><dt>SP Code ในระบบ</dt><dd>${sp.code ? esc(sp.code) : '— ยังไม่มี —'}</dd></div>
+    <div><dt>Ratio</dt><dd>${esc(sp.ratio || '-')}${sp.role === 'ตัวแม่' ? ' · ตัวแม่' : ''}</dd></div>
+    <div class="w"><dt>พิกัดในระบบ</dt><dd>${sp.lat != null ? esc(sp.lat + ',' + sp.lon) : 'ไม่มีพิกัด'}</dd></div>
+    ${sp.land ? `<div class="w"><dt>จุดสังเกต</dt><dd>${esc(sp.land)}</dd></div>` : ''}
+    ${sp.approval === 'รออนุมัติ' ? '<div class="w"><dt>สถานะ</dt><dd>SP นี้ยังรอ Admin อนุมัติ</dd></div>' : ''}
+  </dl>`;
+}
+async function spSend(btn, action, data, hintId){
+  const h = $(hintId); h.className = 'hint'; h.textContent = '';
+  const j = await busy(btn, 'กำลังส่ง…', () => api(action, data));
+  if (!j.ok) { h.className = 'hint bad'; h.textContent = j.error || 'ส่งไม่สำเร็จ'; return; }
+  spClose(); say(j.message || 'ส่งให้ Admin แล้ว');
+}
+async function spFlow(spText, item){
+  const j = await api('sp_check', {sp: spText});
+  if (!j || !j.ok) { if (j && j.error) say('ตรวจ SP ไม่ได้: ' + j.error); return; }
+  if (j.status === 'empty') return;
+  const ref = item && item.id ? item.id : '';
+  const box = $('spdBox');
+  const pend = j.pending && j.pending.length ? `<div class="pend">มีคำขอรออนุมัติอยู่: ${esc(j.pending.join(' · '))}<br>ส่งใหม่จะแทนคำขอเดิมประเภทเดียวกัน</div>` : '';
+  const src = `<p class="src">จากช่อง SP: ${esc(spText)}</p>`;
+  if (j.status === 'match' || j.status === 'nocode') {
+    const sp = j.sp, addCode = j.status === 'nocode';
+    box.innerHTML = `<div class="st ok">${ic('check')}พบ SP ในระบบ</div>
+      <div class="alias">${esc(sp.disp)}</div>${src}${spInfo(sp)}${pend}
+      ${addCode ? `<div class="pend">ในระบบยังไม่มี SP Code — จะส่ง <b>${esc(j.parsed.code)}</b> ให้ Admin เพิ่มด้วย</div>` : ''}
+      <label for="spLL">อัปเดตพิกัด SP (Lat,Long)${addCode ? ' — ไม่บังคับ' : ''}</label>
+      <input id="spLL" inputmode="decimal" autocomplete="off" placeholder="16.202701,103.898637">
+      <p class="hint" id="spH"></p>
+      <div class="two"><button id="spNo" class="ghost">ข้าม</button><button id="spGo">${ic('check')}${addCode ? 'ส่งให้ Admin' : 'ส่งอัปเดตพิกัด'}</button></div>`;
+    $('spGo').onclick = () => {
+      const ll = $('spLL').value.trim();
+      if (!addCode || ll) { const e = spLL(ll); if (e) { $('spH').className = 'hint bad'; $('spH').textContent = e; return; } }
+      spSend($('spGo'), 'sp_update', {key: sp.key, latlon: ll, code: addCode ? j.parsed.code : '', ref, sp: spText}, 'spH');
+    };
+  } else if (j.status === 'codediff') {
+    const sp = j.sp;
+    box.innerHTML = `<div class="st warn">${ic('warn')}SP Code ไม่ตรง</div>
+      <div class="alias">${esc(sp.disp)}</div>${src}
+      <dl class="kv"><div><dt>ในระบบ</dt><dd>${esc(sp.code)}</dd></div><div><dt>ที่บันทึก</dt><dd>${esc(j.parsed.code)}</dd></div></dl>${pend}
+      <p class="hint">ถ้าพิมพ์ผิด กด “แก้ใน CMtap” · ถ้าเป็นการตัดถ่าย/เปลี่ยนรหัสจริง กด “ส่งคำขอเปลี่ยนรหัส”</p>
+      <label for="spLL">อัปเดตพิกัด SP (Lat,Long) — ไม่บังคับ</label>
+      <input id="spLL" inputmode="decimal" autocomplete="off" placeholder="16.202701,103.898637">
+      <p class="hint" id="spH"></p>
+      <div class="two"><button id="spEdit" class="ghost">${ic('edit')}แก้ใน CMtap</button><button id="spGo">ส่งคำขอเปลี่ยนรหัส</button></div>
+      <button id="spNo" class="ghost big" style="margin-top:10px">ข้าม</button>`;
+    $('spEdit').onclick = () => { spClose(); const b = document.querySelector(`.item[data-id="${CSS.escape(ref)}"] [data-a=edit]`); if (b) b.click(); else say('เปิดรายการนี้แล้วกดแก้ไข'); };
+    $('spGo').onclick = () => {
+      const ll = $('spLL').value.trim();
+      if (ll) { const e = spLL(ll); if (e) { $('spH').className = 'hint bad'; $('spH').textContent = e; return; } }
+      spSend($('spGo'), 'sp_update', {key: sp.key, latlon: ll, code: j.parsed.code, ref, sp: spText}, 'spH');
+    };
+  } else if (j.status === 'notfound') {
+    const p = j.parsed;
+    box.innerHTML = `<div class="st warn">${ic('plus')}ยังไม่มี SP นี้ในระบบ</div>
+      <div class="alias">${esc(p.disp)}</div>${src}
+      ${j.warn || j.hint ? `<div class="pend">${esc([j.warn, (j.hint || '').replace(/^ · /, '')].filter(Boolean).join(' · '))}</div>` : ''}
+      <label for="spCode">SP Code</label><input id="spCode" inputmode="numeric" maxlength="10" value="${esc(p.code || '')}" autocomplete="off">
+      <label for="spLL">พิกัด SP (Lat,Long) <i>*</i></label>
+      <input id="spLL" inputmode="decimal" autocomplete="off" placeholder="16.202701,103.898637">
+      <label for="spRatio">Ratio</label><select id="spRatio">${SP_RATIOS.map(r => `<option>${r}</option>`).join('')}</select>
+      <label for="spLand">จุดสังเกต</label><input id="spLand" maxlength="200" autocomplete="off">
+      <p class="hint" id="spH"></p>
+      <div class="two"><button id="spNo" class="ghost">ข้าม</button><button id="spGo">${ic('plus')}เพิ่ม SP</button></div>`;
+    $('spGo').onclick = () => {
+      const e = spLL($('spLL').value);
+      if (e) { $('spH').className = 'hint bad'; $('spH').textContent = e; return; }
+      spSend($('spGo'), 'sp_add', {alias: p.disp, code: $('spCode').value.trim(), latlon: $('spLL').value.trim(),
+        ratio: $('spRatio').value, land: $('spLand').value.trim(), ref}, 'spH');
+    };
+  } else {
+    box.innerHTML = `<div class="st bad">${ic('warn')}อ่านช่อง SP ไม่ได้</div>${src}
+      <p class="hint bad">${esc(j.error || 'รูปแบบไม่ถูกต้อง')}</p>
+      <p class="hint">รูปแบบที่ถูก: 2805 153 00/03 SP034 3846623</p>
+      <div class="two"><button id="spNo" class="ghost">ข้าม</button><button id="spEdit">${ic('edit')}แก้ใน CMtap</button></div>`;
+    $('spEdit').onclick = () => { spClose(); const b = document.querySelector(`.item[data-id="${CSS.escape(ref)}"] [data-a=edit]`); if (b) b.click(); };
+  }
+  $('spNo').onclick = spClose;
+  $('spd').classList.remove('hide');
+  const f = $('spLL'); if (f) f.focus();
+}
+
 
 if (token && me) { goHome(); ping(); loadPP(); } else { view('vLogin'); ping(); }
 </script>
